@@ -1,5 +1,4 @@
 import { Stack } from "expo-router";
-import React from "react";
 import { colors } from "@/constants/tokens";
 
 export default function AuthLayout() {
@@ -8,7 +7,6 @@ export default function AuthLayout() {
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: "#fff" },
-        animation: "slide_from_right",
       }}
     >
       <Stack.Screen name="login" />
