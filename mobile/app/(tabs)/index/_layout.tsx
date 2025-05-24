@@ -1,6 +1,5 @@
 import { Stack } from "expo-router";
 import React from "react";
-import { colors } from "@/constants/tokens";
 
 export default function HomeStackLayout() {
   return (
@@ -12,13 +11,14 @@ export default function HomeStackLayout() {
       }}
     >
       <Stack.Screen name="index" />
-      <Stack.Screen
+      {/* Comment out or remove these screens until you create the actual files */}
+      {/* <Stack.Screen
         name="water-details"
         options={{
           headerShown: true,
           title: "Water Quality Details",
           headerTintColor: colors.primary,
-          presentation: "card",
+          presentation: "card"
         }}
       />
       <Stack.Screen
@@ -27,9 +27,9 @@ export default function HomeStackLayout() {
           headerShown: true,
           title: "Add Measurement",
           headerTintColor: colors.primary,
-          presentation: "modal",
+          presentation: "modal"
         }}
-      />
+      /> */}
     </Stack>
   );
 }

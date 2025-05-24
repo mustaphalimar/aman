@@ -21,7 +21,7 @@ export default function LoginScreen() {
 
   const handleLogin = () => {
     // Implement your login logic here
-    router.replace("/(tabs)");
+    router.replace("/(tabs)/index");
   };
 
   return (
@@ -99,12 +99,12 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.signupContainer}>
+          {/* <View style={styles.signupContainer}>
             <Text style={styles.signupText}>Don't have an account? </Text>
             <TouchableOpacity onPress={() => router.push("/auth/signup")}>
               <Text style={styles.signupLink}>Sign Up</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

@@ -1,17 +1,16 @@
+import { Feather } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React from "react";
 import {
-  StyleSheet,
-  View,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-  StatusBar,
   Dimensions,
+  SafeAreaView,
   ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Feather } from "@expo/vector-icons";
 import { LineChart } from "react-native-chart-kit";
-import { router } from "expo-router";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -103,13 +102,13 @@ const HomeScreen: React.FC = () => {
 
           <View style={styles.tabContainer}>
             <TouchableOpacity style={styles.tab}>
+              <Text style={styles.tabText}>Day</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.tab}>
               <Text style={styles.tabText}>Week</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.tab, styles.activeTab]}>
               <Text style={[styles.tabText, styles.activeTabText]}>Month</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.tab}>
-              <Text style={styles.tabText}>Year</Text>
             </TouchableOpacity>
           </View>
 

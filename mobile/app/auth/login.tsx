@@ -9,19 +9,29 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
+  ActivityIndicator,
+  Animated,
 } from "react-native";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Feather } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = () => {
-    // Implement your login logic here
-    router.replace("/(tabs)/index");
+    // Show loading overlay
+    setIsLoading(true);
+
+    // Simulate login process
+    setTimeout(() => {
+      // Navigate to main app after "login" completes
+      router.replace("/(tabs)/index");
+    }, 3000); // 3 seconds delay to show the loading state
   };
 
   return (
@@ -94,19 +104,47 @@ export default function LoginScreen() {
               <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={handleLogin}
+              disabled={isLoading}
+            >
               <Text style={styles.loginButtonText}>Login</Text>
             </TouchableOpacity>
           </View>
 
-          <View style={styles.signupContainer}>
+          {/* <View style={styles.signupContainer}>
             <Text style={styles.signupText}>Don't have an account? </Text>
             <TouchableOpacity onPress={() => router.push("/auth/signup")}>
               <Text style={styles.signupLink}>Sign Up</Text>
             </TouchableOpacity>
-          </View>
+          </View> */}
         </View>
       </KeyboardAvoidingView>
+
+      {/* Loading Overlay */}
+      {isLoading && (
+        <View style={styles.loadingOverlay}>
+          <BlurView
+            intensity={5}
+            style={{
+              ...StyleSheet.absoluteFillObject,
+              overflow: "hidden",
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+            }}
+          />
+          <View style={styles.loadingCard}>
+            <ActivityIndicator size="large" color="#30b8b2" />
+            <Text style={styles.loadingTitle}>
+              Hang On, We Will Logging You In
+            </Text>
+            <Text style={styles.loadingSubtitle}>
+              Welcome back! hang on, we are will signing you in a moment.
+            </Text>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -205,5 +243,43 @@ const styles = StyleSheet.create({
     color: "#30b8b2",
     fontSize: 14,
     fontWeight: "600",
+  },
+  // Loading overlay styles
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(30, 42, 71, 0.8)", // Dark blue with opacity
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+    backdropFilter: "blur(10px)", // Add blur effect
+  },
+  loadingCard: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 30,
+    width: "80%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  loadingTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#1e2a47",
+    marginTop: 20,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  loadingSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
+    lineHeight: 20,
   },
 });

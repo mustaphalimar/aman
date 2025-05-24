@@ -4,12 +4,12 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Slot, Stack, router } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import "react-native-reanimated";
-import { useEffect, useState } from "react";
+import { Slot, router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { View, ActivityIndicator } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, View } from "react-native";
+import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 
@@ -71,6 +71,7 @@ export default function RootLayout() {
   useEffect(() => {
     if (appIsReady && fontsLoaded && initialRoute) {
       // Navigate to the initial route once everything is ready
+      // @ts-ignore
       router.replace(initialRoute);
     }
   }, [appIsReady, fontsLoaded, initialRoute]);

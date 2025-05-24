@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Dimensions,
+  ScrollView,
 } from "react-native";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -15,6 +16,7 @@ import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   interpolate,
+  withTiming,
 } from "react-native-reanimated";
 
 const { width, height } = Dimensions.get("window");
@@ -76,6 +78,7 @@ const Dot = ({ index, scrollX, currentIndex }: any) => {
 export default function OnboardingScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useSharedValue(0);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -85,9 +88,22 @@ export default function OnboardingScreen() {
 
   const handleNext = () => {
     if (currentIndex < ONBOARDING_DATA.length - 1) {
+      // Calculate the next screen position
+      const nextScreenPosition = (currentIndex + 1) * width;
+
+      // Programmatically scroll to the next screen
+      scrollViewRef.current?.scrollTo({
+        x: nextScreenPosition,
+        animated: true,
+      });
+
+      // Update the current index
       setCurrentIndex(currentIndex + 1);
+
+      // Animate the scrollX value for smooth dot animation
+      scrollX.value = withTiming(nextScreenPosition, { duration: 300 });
     } else {
-      router.replace("/auth/login");
+      router.replace("/auth");
     }
   };
 
@@ -106,6 +122,8 @@ export default function OnboardingScreen() {
       </View>
 
       <Animated.ScrollView
+        // @ts-ignore
+        ref={scrollViewRef}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
@@ -156,8 +174,8 @@ const styles = StyleSheet.create({
   },
   skipContainer: {
     position: "absolute",
-    top: 50,
-    right: 20,
+    top: 70,
+    right: 30,
     zIndex: 1,
   },
   skipText: {
