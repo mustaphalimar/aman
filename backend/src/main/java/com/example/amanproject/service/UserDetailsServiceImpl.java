@@ -17,11 +17,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+
+        if (email == null || email.isEmpty() || user.getPassword() == null || user.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("Email or password cannot be null or empty");
+        }
+
+
+
         return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
+                email,
                 user.getPassword(),
                 new ArrayList<>()
         );

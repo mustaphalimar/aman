@@ -1,12 +1,10 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { StyleSheet } from "react-native";
 
 import { colors, fontSize } from "@/constants/tokens";
 // import { useColorScheme } from "@/hooks/useColorScheme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { BlurView } from "expo-blur";
 
 export default function TabLayout() {
   // const colorScheme = useColorScheme();
@@ -27,17 +25,6 @@ export default function TabLayout() {
           borderTopWidth: 0,
           padding: 8,
         },
-        tabBarBackground: () => (
-          <BlurView
-            intensity={95}
-            style={{
-              ...StyleSheet.absoluteFillObject,
-              overflow: "hidden",
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
-            }}
-          />
-        ),
       }}
     >
       <Tabs.Screen

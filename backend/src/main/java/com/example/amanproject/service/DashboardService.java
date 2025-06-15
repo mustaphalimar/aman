@@ -54,7 +54,7 @@ public class DashboardService {
         return paymentRepository.findTop5ByStatusOrderByPaymentDateDesc(PaymentStatus.COMPLETED)
                 .stream()
                 .map(payment -> new RecentSaleDTO(
-                        payment.getUser().getName(),
+                        payment.getUser().getFirst_name()+" "+payment.getUser().getLast_name(),
                         payment.getAmount(),
                         payment.getPaymentDate()
                 ))

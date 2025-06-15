@@ -1,21 +1,25 @@
+import { loginUser } from "@/Services/userServices";
+import { Feather } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import { router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
   StyleSheet,
-  View,
   Text,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
-  KeyboardAvoidingView,
-  Platform,
-  Image,
-  ActivityIndicator,
-  Animated,
+  View,
 } from "react-native";
-import { router } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { Feather } from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
+import Toast from "react-native-toast-message";
+
+import { Formik } from "formik";
+import * as Yup from "yup";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -23,23 +27,51 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
+  const handleLogin = async (values) => {
     // Show loading overlay
     setIsLoading(true);
 
+    console.log("Logging in with values:", values);
+    setTimeout(async () => {
+      try {
+        await loginUser(values.email, values.password);
+        Toast.show({
+          type: "success",
+          text1: "Login successful",
+        });
+        router.replace("/(tabs)/index");
+      } catch (error) {
+        Toast.show({
+          type: "error",
+          text1: "Login failed",
+          text2: "Check your credentials and try again : " + error.message,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }, 3000);
+
+    /*
     // Simulate login process
-    setTimeout(() => {
-      // Navigate to main app after "login" completes
-      router.replace("/(tabs)/index");
-    }, 3000); // 3 seconds delay to show the loading state
+     // 3 seconds delay to show the loading state
+    */
   };
+
+  const validationSchema = Yup.object().shape({
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    password: Yup.string()
+      .min(6, "Min 6 characters")
+      .required("Password is required"),
+  });
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
+
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "height" : "height"}
         style={styles.keyboardView}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 40 : 50}
       >
         <View style={styles.content}>
           <View style={styles.logoContainer}>
@@ -53,65 +85,105 @@ export default function LoginScreen() {
           <Text style={styles.title}>Welcome Back</Text>
           <Text style={styles.subtitle}>Sign in to continue</Text>
 
-          <View style={styles.form}>
-            <View style={styles.inputContainer}>
-              <Feather
-                name="mail"
-                size={20}
-                color="#666"
-                style={styles.inputIcon}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
+          <Formik
+            initialValues={{ email: "", password: "" }}
+            validationSchema={validationSchema}
+            onSubmit={handleLogin}
+          >
+            {({
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              values,
+              errors,
+              touched,
+              setFieldTouched,
+            }) => (
+              <>
+                <View style={styles.form}>
+                  <View style={styles.inputContainer}>
+                    <Feather
+                      name="mail"
+                      size={20}
+                      color="#666"
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Email"
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      value={values.email}
+                      onChangeText={handleChange("email")}
+                      onBlur={() => {
+                        handleBlur("email");
+                        setFieldTouched("email", true);
+                      }}
+                    />
+                    {touched.email && errors.email && (
+                      <Text style={{ color: "red", marginBottom: 8 }}>
+                        {errors.email}
+                      </Text>
+                    )}
+                  </View>
 
-            <View style={styles.inputContainer}>
-              <Feather
-                name="lock"
-                size={20}
-                color="#666"
-                style={styles.inputIcon}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-              />
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                style={styles.eyeIcon}
-              >
-                <Feather
-                  name={showPassword ? "eye" : "eye-off"}
-                  size={20}
-                  color="#666"
-                />
-              </TouchableOpacity>
-            </View>
+                  <View style={styles.inputContainer}>
+                    <Feather
+                      name="lock"
+                      size={20}
+                      color="#666"
+                      style={styles.inputIcon}
+                    />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Password"
+                      value={password}
+                      onChangeText={setPassword}
+                      secureTextEntry={!showPassword}
+                      value={values.password}
+                      onChangeText={handleChange("password")}
+                      onBlur={() => {
+                        handleBlur("password");
+                        setFieldTouched("password", true);
+                      }}
+                    />
+                    {touched.password && errors.password && (
+                      <Text style={{ color: "red", marginBottom: 8 }}>
+                        {errors.password}
+                      </Text>
+                    )}
+                    <TouchableOpacity
+                      onPress={() => setShowPassword(!showPassword)}
+                      style={styles.eyeIcon}
+                    >
+                      <Feather
+                        name={showPassword ? "eye" : "eye-off"}
+                        size={20}
+                        color="#666"
+                      />
+                    </TouchableOpacity>
+                  </View>
 
-            <TouchableOpacity
-              onPress={() => router.push("/auth/forgot-password")}
-              style={styles.forgotPasswordContainer}
-            >
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-            </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => router.push("/auth/forgot-password")}
+                    style={styles.forgotPasswordContainer}
+                  >
+                    <Text style={styles.forgotPasswordText}>
+                      Forgot Password?
+                    </Text>
+                  </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.loginButton}
-              onPress={handleLogin}
-              disabled={isLoading}
-            >
-              <Text style={styles.loginButtonText}>Login</Text>
-            </TouchableOpacity>
-          </View>
+                  <TouchableOpacity
+                    style={styles.loginButton}
+                    onPress={handleSubmit}
+                    disabled={isLoading}
+                  >
+                    <Text style={styles.loginButtonText}>Login</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+          </Formik>
 
           {/* <View style={styles.signupContainer}>
             <Text style={styles.signupText}>Don't have an account? </Text>
@@ -136,11 +208,9 @@ export default function LoginScreen() {
           />
           <View style={styles.loadingCard}>
             <ActivityIndicator size="large" color="#30b8b2" />
-            <Text style={styles.loadingTitle}>
-              Hang On, We Will Logging You In
-            </Text>
+            <Text style={styles.loadingTitle}>Welcome back </Text>
             <Text style={styles.loadingSubtitle}>
-              Welcome back! hang on, we are will signing you in a moment.
+              We are will signing you in a moment.
             </Text>
           </View>
         </View>

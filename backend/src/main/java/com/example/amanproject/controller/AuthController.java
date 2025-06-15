@@ -24,9 +24,10 @@ public class AuthController {
 
 
         try {
-            String username = loginRequest.get("username");
+            String email = loginRequest.get("email");
             String password = loginRequest.get("password");
-            String token = authService.login(username, password);
+            System.out.println("login info : " + email + " | "+password);
+            String token = authService.login(email, password);
 
             String role = jwtUtil.extractRole(token);
 

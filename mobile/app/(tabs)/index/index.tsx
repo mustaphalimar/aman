@@ -133,7 +133,6 @@ const HomeScreen: React.FC = () => {
           <View style={styles.metricsContainer}>
             <View style={styles.metricCard}>
               <Text style={styles.metricTitle}>TDS</Text>
-              <Text style={styles.metricSubtitle}>Formazin Nephetric Unit</Text>
               <View style={styles.metricValueContainer}>
                 <Text style={styles.metricValue}>15</Text>
                 <Feather
@@ -147,7 +146,7 @@ const HomeScreen: React.FC = () => {
 
             <View style={styles.metricCard}>
               <Text style={styles.metricTitle}>pH</Text>
-              <Text style={styles.metricSubtitle}></Text>
+
               <View style={styles.metricValueContainer}>
                 <Text style={styles.metricValue}>6,5</Text>
                 <Feather
@@ -167,6 +166,7 @@ const HomeScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 25,
     flex: 1,
     backgroundColor: "#f8f9fa",
   },
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
   metricTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "white",
+    color: "#AAA",
     marginBottom: 5,
   },
   metricSubtitle: {
