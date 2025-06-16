@@ -1,5 +1,6 @@
 package com.example.amanproject.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,6 +35,7 @@ public class Role {
     private Timestamp createdAt;
 
     @OneToMany(mappedBy = "role")
+    @JsonIgnore
     private List<User> users;
 
     // Getters & Setters

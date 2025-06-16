@@ -37,6 +37,12 @@ public class JwtFilter extends GenericFilterBean {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         String authHeader = httpRequest.getHeader("Authorization");
+        String path = httpRequest.getRequestURI();
+
+        if (path.startsWith("/api/auth/login")) {
+            chain.doFilter(request, response);
+            return;
+        }
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);

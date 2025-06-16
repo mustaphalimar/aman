@@ -44,6 +44,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/waterquality/send/{deviceId}").permitAll()
+
                         .requestMatchers("api/dashboard/revenue").hasRole(Role.ADMIN.toString())
                         .requestMatchers("api/dashboard/devices/active").hasRole(Role.ADMIN.toString())
                         .requestMatchers("api/dashboard/sales").hasRole(Role.ADMIN.toString())

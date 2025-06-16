@@ -21,6 +21,7 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
     private UserMobileRepository userMobileRepository;
     @Autowired
     private HttpServletRequest request;
@@ -34,6 +35,7 @@ public class UserController {
     public ResponseEntity<?> updateUser(@RequestBody UpdateUserDto updateUserDto,
                                         Authentication authentication) {
         String email = authentication.getName();
+        System.out.println("This is the email extract from the authenticated get name()"+email);
         User user = userMobileRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
