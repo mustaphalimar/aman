@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
 
     /*@Query("SELECT new com.example.amanproject.dto.CustomerOverviewDTO(" +
             "u.name, u.email, COALESCE(d.deviceType, 'Unknown'), " +
@@ -30,7 +30,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     );*/
 
     @Query("SELECT new com.example.amanproject.dto.CustomerOverviewDTO(" +
-            "u.name, u.email, " +
+            " CONCAT(u.first_name, ' ', u.last_name), u.email, " +
             "'ALL', " +
             "SUM(p.amount), " +
             "COUNT(DISTINCT d.id)) " +

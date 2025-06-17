@@ -1,6 +1,7 @@
 package com.example.amanproject.model;
 
 import com.example.amanproject.enums.DeviceStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -35,6 +36,7 @@ public class Device {
     private Timestamp createdAt;
 
     @OneToMany(mappedBy = "device", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<WaterQualityData> waterQualityData;
 
     // Getters & Setters

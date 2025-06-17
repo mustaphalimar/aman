@@ -35,8 +35,8 @@ public class AuthService {
         throw new RuntimeException("Invalid credentials");
     }*/
 
-    public String login(String username, String password) {
-        Optional<User> userOptional = userRepository.findByUsername(username);
+    public String login(String email, String password) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
@@ -49,7 +49,7 @@ public class AuthService {
                     throw new RuntimeException("Access denied: You are not authorized to access this system");
                 }*/
 
-                return jwtUtil.generateToken(username, user.getRole().getName());
+                return jwtUtil.generateToken(email, user.getRole().getName());
                 //return user.getRole().getName();
 
             }
@@ -59,7 +59,7 @@ public class AuthService {
                 // Update the password to be BCrypt encoded for next time
                 user.setPassword(passwordEncoder.encode(password));
                 userRepository.save(user);
-                return jwtUtil.generateToken(username, user.getRole().getName());
+                return jwtUtil.generateToken(email, user.getRole().getName());
 
             }
         }

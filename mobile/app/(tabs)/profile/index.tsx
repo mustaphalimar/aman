@@ -1,17 +1,108 @@
-import React from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-} from "react-native";
+import { getUserProfile, logoutUser } from "@/Services/userServices";
 import { Feather, FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Toast from "react-native-toast-message";
 
 const ProfileScreen: React.FC = () => {
+  const [profile, setProfile] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await getUserProfile();
+        setProfile(response);
+      } catch (err) {
+        setError("Failed to load profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const logoutHandler = async () => {
+    console.log("Logging out...");
+    setLoading(true);
+
+    setTimeout(async () => {
+      try {
+        await logoutUser();
+        Toast.show({
+          type: "success",
+          text1: "Logout successful",
+        });
+        router.replace("/auth/login");
+      } catch (error) {
+        Toast.show({
+          type: "error",
+          text1: "Logout failed",
+          text2: "Check your credentials and try again : ",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }, 3000);
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingOverlay}>
+        <BlurView
+          intensity={5}
+          style={{
+            ...StyleSheet.absoluteFillObject,
+            overflow: "hidden",
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+          }}
+        />
+        <View style={styles.loadingCard}>
+          <ActivityIndicator size="large" color="#30b8b2" />
+          <Text style={styles.loadingTitle}>Logging out </Text>
+          <Text style={styles.loadingSubtitle}>
+            We are will signing you out a moment ...
+          </Text>
+        </View>
+      </View>
+
+      // <SafeAreaView
+      //   style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      // >
+      //   <ActivityIndicator size="large" color="#30b8b2" />
+      // </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 20,
+        }}
+      >
+        <Text style={{ color: "red", fontSize: 16 }}>{error}</Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -34,7 +125,9 @@ const ProfileScreen: React.FC = () => {
 
           <Text style={styles.userName}>Zara Larson</Text>
           <View style={styles.emailContainer}>
-            <Text style={styles.emailText}>zaralarson12@gmail.com</Text>
+            <Text style={styles.emailText}>
+              {profile.username || "zaralarson12@gmail.com"}
+            </Text>
           </View>
 
           <View style={styles.menuContainer}>
@@ -65,7 +158,10 @@ const ProfileScreen: React.FC = () => {
               <Text style={styles.menuText}>Projects You Are In</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity
+              onPress={() => logoutHandler()}
+              style={styles.menuItem}
+            >
               <View style={[styles.menuIconContainer, styles.logoutIcon]}>
                 <Feather name="log-out" size={20} color="#f5a623" />
               </View>
@@ -80,6 +176,7 @@ const ProfileScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 30,
     flex: 1,
     backgroundColor: "#f0f2f5",
   },
@@ -211,6 +308,43 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(30, 42, 71, 0.8)", // Dark blue with opacity
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+    backdropFilter: "blur(10px)", // Add blur effect
+  },
+  loadingCard: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 30,
+    width: "80%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  loadingTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#1e2a47",
+    marginTop: 20,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  loadingSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
+    lineHeight: 20,
   },
 });
 
