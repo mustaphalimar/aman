@@ -1,18 +1,19 @@
 package com.example.amanproject.dto;
 
 public class WaterQualityStatusDto {
-
-    private double pH;
-    private double turbidity;
-    private double temperature;
-    private double tds;
-    private double chlorineLevel;
-    private String status; // Normal, Warning, Danger
+    private Double pH;
+    private Double turbidity;
+    private Double temperature;
+    private Double tds;
+    private Double chlorineLevel;
+    private String status;
 
     public WaterQualityStatusDto() {
     }
 
-    public WaterQualityStatusDto(double pH, double turbidity, double temperature, double tds, double chlorineLevel, String status) {
+    // Constructor that handles null values properly
+    public WaterQualityStatusDto(Double pH, Double turbidity, Double temperature,
+                                 Double tds, Double chlorineLevel, String status) {
         this.pH = pH;
         this.turbidity = turbidity;
         this.temperature = temperature;
@@ -20,7 +21,6 @@ public class WaterQualityStatusDto {
         this.chlorineLevel = chlorineLevel;
         this.status = status;
     }
-
     public double getpH() {
         return pH;
     }
