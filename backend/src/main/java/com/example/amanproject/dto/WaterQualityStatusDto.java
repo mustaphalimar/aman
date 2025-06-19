@@ -20,7 +20,6 @@ public class WaterQualityStatusDto {
         this.chlorineLevel = chlorineLevel;
         this.status = status;
     }
-
     public double getpH() {
         return pH;
     }
