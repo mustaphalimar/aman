@@ -1,8 +1,9 @@
 import { getUserProfile, logoutUser } from "@/Services/userServices";
 import { Feather, FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -13,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import Toast from "react-native-toast-message";
 
 const ProfileScreen: React.FC = () => {
@@ -20,20 +22,22 @@ const ProfileScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await getUserProfile();
-        setProfile(response);
-      } catch (err) {
-        setError("Failed to load profile");
-      } finally {
-        setLoading(false);
-      }
-    };
+  useFocusEffect(
+    useCallback(() => {
+      const fetchProfile = async () => {
+        try {
+          const response = await getUserProfile();
+          setProfile(response);
+        } catch (err) {
+          setError("Failed to load profile");
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    fetchProfile();
-  }, []);
+      fetchProfile();
+    }, [])
+  );
 
   const logoutHandler = async () => {
     console.log("Logging out...");
@@ -123,10 +127,13 @@ const ProfileScreen: React.FC = () => {
             </View>
           </View>
 
-          <Text style={styles.userName}>Zara Larson</Text>
+          <Text style={styles.userName}>
+            {" "}
+            {profile.last_name + " " + profile.first_name}
+          </Text>
           <View style={styles.emailContainer}>
             <Text style={styles.emailText}>
-              {profile.username || "zaralarson12@gmail.com"}
+              {profile.email || "zaralarson12@gmail.com"}
             </Text>
           </View>
 

@@ -24,7 +24,7 @@ public class CustomerService {
     public List<CustomerOverviewDTO> getCustomerOverview() {
         return userRepository.fetchCustomerOverview(
                 PaymentStatus.COMPLETED,
-                Role.CLIENT
+                Role.CUSTOMER
         );
     }
 }
