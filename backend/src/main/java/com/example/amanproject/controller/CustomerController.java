@@ -13,10 +13,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+// hello
 @RestController
 //@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/api/customers")
 public class CustomerController {
+
 
     private final CustomerService customerService;
 
@@ -26,6 +29,7 @@ public class CustomerController {
     }
 
 
+// Hello
     @GetMapping("/overview")
     public ResponseEntity<List<CustomerDTO>> getOverview() {
         List<CustomerDTO> customers = customerService.getCustomerOverview();
