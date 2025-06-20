@@ -8,6 +8,10 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 
 @Entity
 public class WaterQualityData {
@@ -29,17 +33,6 @@ public class WaterQualityData {
     public WaterQualityData() {
     }
 
-
-    public WaterQualityData(double pH, double turbidity, double temperature, double tds, double chlorineLevel, LocalDateTime timestamp) {
-        this.id = id;
-        this.device = device;
-        this.pH = pH;
-        this.turbidity = turbidity;
-        this.temperature = temperature;
-        this.tds = tds;
-        this.chlorineLevel = chlorineLevel;
-        this.timestamp = timestamp;
-    }
     public WaterQualityData(Long id, Device device, double pH, double turbidity, double temperature, double tds, double chlorineLevel, LocalDateTime timestamp) {
         this.id = id;
         this.device = device;

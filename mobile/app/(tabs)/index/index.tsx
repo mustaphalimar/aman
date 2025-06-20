@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+import { Feather } from "@expo/vector-icons";
+import { router } from "expo-router";
+import React from "react";
+import {
+=======
 import { WaterQualityStatus } from "@/intarfaces";
 import { getLatestWaterStatus } from "@/Services/WaterQualityService";
 import { Feather } from "@expo/vector-icons";
@@ -6,6 +12,7 @@ import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
   Dimensions,
   SafeAreaView,
   ScrollView,
@@ -46,12 +53,16 @@ interface ChartConfig {
 }
 
 const HomeScreen: React.FC = () => {
+<<<<<<< HEAD
+  // Mock data for the chart
+=======
   const [statusData, setStatusData] = useState<WaterQualityStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [colorStatus, setColorStatus] = useState("");
 
   const deviceId = 1; // change as needed
 
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
   const data: ChartData = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
     datasets: [
@@ -81,6 +92,12 @@ const HomeScreen: React.FC = () => {
     fillShadowGradientOpacity: 0.5,
   };
 
+<<<<<<< HEAD
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        <View style={styles.welcomeCard}>
+=======
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -118,25 +135,34 @@ const HomeScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={[styles.welcomeCard, { backgroundColor: colorStatus }]}>
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
           <Text style={styles.welcomeText}>Hi, Hamza!</Text>
 
           <View style={styles.waterQualityCard}>
             <View style={styles.waterQualityContent}>
+<<<<<<< HEAD
+              <View style={styles.waterQualityIndicator} />
+=======
               <View
                 style={[
                   styles.waterQualityIndicator,
                   { backgroundColor: colorStatus },
                 ]}
               />
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
               <View style={styles.waterQualityTextContainer}>
                 <Text style={styles.waterQualityLabel}>
                   Niveau de qualité de l&apos;eau
                 </Text>
+<<<<<<< HEAD
+                <Text style={styles.waterQualityValue}>Bonne</Text>
+=======
                 <Text
                   style={[styles.waterQualityValue, { color: colorStatus }]}
                 >
                   {statusData?.status}
                 </Text>
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
               </View>
             </View>
             <Feather name="chevron-right" size={24} color="#ccc" />
@@ -182,6 +208,32 @@ const HomeScreen: React.FC = () => {
           </View>
 
           <View style={styles.metricsContainer}>
+<<<<<<< HEAD
+            <View style={styles.metricCard}>
+              <Text style={styles.metricTitle}>TDS</Text>
+              <View style={styles.metricValueContainer}>
+                <Text style={styles.metricValue}>15</Text>
+                <Feather
+                  name="arrow-down-right"
+                  size={24}
+                  color="#30b8b2"
+                  style={styles.metricIcon}
+                />
+              </View>
+            </View>
+
+            <View style={styles.metricCard}>
+              <Text style={styles.metricTitle}>pH</Text>
+
+              <View style={styles.metricValueContainer}>
+                <Text style={styles.metricValue}>6,5</Text>
+                <Feather
+                  name="arrow-up-right"
+                  size={24}
+                  color="#30b8b2"
+                  style={styles.metricIcon}
+                />
+=======
             <View style={styles.rowContainer}>
               <View style={styles.metricCard}>
                 <Text style={styles.metricTitle}>TDS</Text>
@@ -242,11 +294,14 @@ const HomeScreen: React.FC = () => {
                     style={styles.metricIcon}
                   />
                 </View>
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
               </View>
             </View>
           </View>
         </View>
       </ScrollView>
+<<<<<<< HEAD
+=======
 
       {isLoading && (
         <View style={styles.loadingOverlay}>
@@ -268,10 +323,13 @@ const HomeScreen: React.FC = () => {
           </View>
         </View>
       )}
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
     </SafeAreaView>
   );
 };
 
+<<<<<<< HEAD
+=======
 const getStatusColor = (status: string) => {
   console.log("status of whater : " + status);
   switch (status) {
@@ -286,12 +344,16 @@ const getStatusColor = (status: string) => {
   }
 };
 
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
 const styles = StyleSheet.create({
   container: {
     marginTop: 25,
     flex: 1,
     backgroundColor: "#f8f9fa",
+<<<<<<< HEAD
+=======
     marginBottom: 100,
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
   },
   header: {
     paddingHorizontal: 20,
@@ -303,8 +365,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   welcomeCard: {
+<<<<<<< HEAD
+    backgroundColor: "#30b8b2",
+    margin: 20,
+    borderRadius: 20,
+=======
     borderRadius: 20,
     margin: 20,
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
     padding: 20,
     paddingBottom: 0,
   },
@@ -331,6 +399,11 @@ const styles = StyleSheet.create({
   waterQualityIndicator: {
     width: 4,
     height: 40,
+<<<<<<< HEAD
+    backgroundColor: "#30b8b2",
+    borderRadius: 2,
+=======
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
     marginRight: 15,
   },
   waterQualityTextContainer: {
@@ -344,7 +417,11 @@ const styles = StyleSheet.create({
   },
   waterQualityValue: {
     fontSize: 18,
+<<<<<<< HEAD
+    color: "#30b8b2",
+=======
     //color: "#30b8b2",
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
     fontWeight: "500",
   },
   statsContainer: {
@@ -393,11 +470,14 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   metricsContainer: {
+<<<<<<< HEAD
+=======
     flexDirection: "column",
     justifyContent: "space-between",
     marginBottom: 20,
   },
   rowContainer: {
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 20,
@@ -454,6 +534,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
+<<<<<<< HEAD
+=======
   // Loading overlay styles
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -492,6 +574,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 20,
   },
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
 });
 
 export default HomeScreen;

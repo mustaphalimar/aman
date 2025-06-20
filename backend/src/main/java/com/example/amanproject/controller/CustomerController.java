@@ -1,16 +1,20 @@
 package com.example.amanproject.controller;
 
+import com.example.amanproject.dto.CustomerCreationDTO;
+import com.example.amanproject.dto.CustomerDTO;
 import com.example.amanproject.dto.CustomerOverviewDTO;
+import com.example.amanproject.dto.CustomerUpdateDTO;
 import com.example.amanproject.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+//@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/api/customers")
 public class CustomerController {
 
@@ -23,9 +27,30 @@ public class CustomerController {
 
 
     @GetMapping("/overview")
-    public ResponseEntity<List<CustomerOverviewDTO>> getOverview() {
-        List<CustomerOverviewDTO> customers = customerService.getCustomerOverview();
+    public ResponseEntity<List<CustomerDTO>> getOverview() {
+        List<CustomerDTO> customers = customerService.getCustomerOverview();
         return ResponseEntity.ok(customers);
+    }
+
+
+    @PostMapping("/create")
+    public ResponseEntity<String> createCustomer(@RequestBody CustomerCreationDTO dto) {
+        customerService.createCustomer(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Customer created successfully");
+    }
+
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<String> updateCustomer(@PathVariable Long id, @RequestBody CustomerUpdateDTO dto) {
+        customerService.updateCustomer(id, dto);
+        return ResponseEntity.ok("Customer updated successfully");
+    }
+
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteCustomer(@PathVariable Long id) {
+        customerService.deleteCustomer(id);
+        return ResponseEntity.ok("Customer deleted successfully");
     }
 }
 
