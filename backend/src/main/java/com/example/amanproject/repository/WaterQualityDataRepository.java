@@ -1,10 +1,15 @@
 package com.example.amanproject.repository;
 
+import com.example.amanproject.dto.mobileDtos.HistoricalWaterQualityDto;
 import com.example.amanproject.model.Payment;
 import com.example.amanproject.model.WaterQualityData;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,7 +19,6 @@ public interface WaterQualityDataRepository extends JpaRepository<WaterQualityDa
     Optional<WaterQualityData> findTop1ByDeviceIdOrderByTimestampDesc(Long deviceId);
 
 
-// Hello there
 
     @Query(value = """
     SELECT 
@@ -86,5 +90,4 @@ public interface WaterQualityDataRepository extends JpaRepository<WaterQualityDa
             @Param("endDate") LocalDate endDate);
 
     */
-
 }
