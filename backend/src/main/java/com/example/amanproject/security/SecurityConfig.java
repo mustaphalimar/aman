@@ -51,7 +51,12 @@ public class SecurityConfig {
                         .requestMatchers("api/dashboard/sales").hasRole(Role.ADMIN.toString())
                         .requestMatchers("api/dashboard/subscriptions").hasRole(Role.ADMIN.toString())
                         .requestMatchers("/api/dashboard/recent-sales").hasRole(Role.ADMIN.toString())
-                        .requestMatchers("api/customers/overview").hasRole(Role.CUSTOMER.toString())
+                        //.requestMatchers("api/customers/overview").permitAll()
+                        .requestMatchers("api/customers/create").permitAll()
+
+
+
+                        //.requestMatchers("api/customers/overview").hasRole(Role.ADMIN.toString())
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception

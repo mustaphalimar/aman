@@ -19,7 +19,10 @@ import {
 import Toast from "react-native-toast-message";
 
 import { Formik } from "formik";
+<<<<<<< HEAD
+=======
 import { Keyboard } from "react-native";
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
 import * as Yup from "yup";
 
 export default function LoginScreen() {
@@ -29,8 +32,12 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (values) => {
+<<<<<<< HEAD
+    // Show loading overlay
+=======
     Keyboard.dismiss();
 
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
     setIsLoading(true);
 
     console.log("Logging in with values:", values);
@@ -43,7 +50,10 @@ export default function LoginScreen() {
         });
         router.replace("/(tabs)/index");
       } catch (error) {
+<<<<<<< HEAD
+=======
         console.log("error : " + error.message);
+>>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
         Toast.show({
           type: "error",
           text1: "Login failed",
