@@ -7,9 +7,10 @@ import {
 import { WaterQualityStatus } from "@/intarfaces";
 import { getLatestWaterStatus } from "@/Services/WaterQualityService";
 import { Feather } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
 >>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
@@ -100,36 +101,46 @@ const HomeScreen: React.FC = () => {
 =======
   const [isMounted, setIsMounted] = useState(false);
 
-  useEffect(() => {
-    setIsMounted(true);
+  const { data: db, isLoading: isl } = useQuery({
+    queryKey: ["dashboard_data"],
+    queryFn: async () => {
+      const db = await getLatestWaterStatus(deviceId);
+      setColorStatus(getStatusColor(db?.status));
+      return db;
+    },
+    refetchInterval: 5000,
+  });
 
-    const fetchData = async () => {
-      try {
-        const data = await getLatestWaterStatus(deviceId);
+  // useEffect(() => {
+  //   setIsMounted(true);
 
-        if (isMounted) {
-          setStatusData(data);
-          setColorStatus(getStatusColor(data?.status));
-          //console.log(data);
-        }
-      } catch (error) {
-        console.error("Error fetching water data:", error);
-      } finally {
-        if (isMounted) setIsLoading(false);
-      }
-    };
+  //   const fetchData = async () => {
+  //     try {
+  //       const data = await getLatestWaterStatus(deviceId);
 
-    fetchData(); // initial fetch
+  //       if (isMounted) {
+  //         setStatusData(data);
+  //         setColorStatus(getStatusColor(data?.status));
+  //         //console.log(data);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching water data:", error);
+  //     } finally {
+  //       if (isMounted) setIsLoading(false);
+  //     }
+  //   };
 
-    const interval = setInterval(() => {
-      fetchData();
-    }, 5000); // fetch every 5 seconds
+  //   fetchData(); // initial fetch
 
-    return () => {
-      setIsMounted(false);
-      clearInterval(interval);
-    };
-  }, []);
+  //   const interval = setInterval(() => {
+  //     fetchData();
+  //   }, 5000); // fetch every 5 seconds
+
+  //   return () => {
+  //     setIsMounted(false);
+  //     clearInterval(interval);
+  //   };
+  // }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -160,7 +171,7 @@ const HomeScreen: React.FC = () => {
                 <Text
                   style={[styles.waterQualityValue, { color: colorStatus }]}
                 >
-                  {statusData?.status}
+                  {db?.status}
                 </Text>
 >>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
               </View>
@@ -238,7 +249,7 @@ const HomeScreen: React.FC = () => {
               <View style={styles.metricCard}>
                 <Text style={styles.metricTitle}>TDS</Text>
                 <View style={styles.metricValueContainer}>
-                  <Text style={styles.metricValue}>{statusData?.tds}</Text>
+                  <Text style={styles.metricValue}>{db?.tds}</Text>
                   <Feather
                     name="arrow-down-right"
                     size={24}
@@ -252,7 +263,7 @@ const HomeScreen: React.FC = () => {
                 <Text style={styles.metricTitle}>pH</Text>
 
                 <View style={styles.metricValueContainer}>
-                  <Text style={styles.metricValue}>{statusData?.pH}</Text>
+                  <Text style={styles.metricValue}>{db?.pH}</Text>
                   <Feather
                     name="arrow-up-right"
                     size={24}
@@ -268,9 +279,7 @@ const HomeScreen: React.FC = () => {
                 <Text style={styles.metricTitle}>Turbidity</Text>
 
                 <View style={styles.metricValueContainer}>
-                  <Text style={styles.metricValue}>
-                    {statusData?.turbidity}
-                  </Text>
+                  <Text style={styles.metricValue}>{db?.turbidity}</Text>
                   <Feather
                     name="arrow-up-right"
                     size={24}
@@ -284,9 +293,7 @@ const HomeScreen: React.FC = () => {
                 <Text style={styles.metricTitle}>Temperature</Text>
 
                 <View style={styles.metricValueContainer}>
-                  <Text style={styles.metricValue}>
-                    {statusData?.temperature}
-                  </Text>
+                  <Text style={styles.metricValue}>{db?.temperature}</Text>
                   <Feather
                     name="arrow-up-right"
                     size={24}
@@ -303,7 +310,7 @@ const HomeScreen: React.FC = () => {
 <<<<<<< HEAD
 =======
 
-      {isLoading && (
+      {isl && (
         <View style={styles.loadingOverlay}>
           <BlurView
             intensity={5}
