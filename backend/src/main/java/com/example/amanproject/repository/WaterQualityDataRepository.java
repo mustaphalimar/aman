@@ -19,6 +19,7 @@ public interface WaterQualityDataRepository extends JpaRepository<WaterQualityDa
     Optional<WaterQualityData> findTop1ByDeviceIdOrderByTimestampDesc(Long deviceId);
 
 
+// Hello there
 
     @Query(value = """
     SELECT 
