@@ -18,7 +18,7 @@ public interface WaterQualityDataRepository extends JpaRepository<WaterQualityDa
     Optional<WaterQualityData> findTop1ByDeviceIdOrderByTimestampDesc(Long deviceId);
 
 
-// Hello there
+
 
     @Query(value = """
     SELECT 
@@ -69,6 +69,7 @@ public interface WaterQualityDataRepository extends JpaRepository<WaterQualityDa
     Optional<Object[]> findRawDailyAverages(
             @Param("deviceId") Long deviceId,
             @Param("date") LocalDate date);
+
 
 /*
     @Query("SELECT new com.example.amanproject.dto.HistoricalWaterQualityDto(" +
