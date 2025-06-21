@@ -1,15 +1,9 @@
 import { getUserProfile, logoutUser } from "@/Services/userServices";
 import { Feather, FontAwesome5, Ionicons } from "@expo/vector-icons";
-<<<<<<< HEAD
-import { BlurView } from "expo-blur";
-import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
-=======
 import { useFocusEffect } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
 import React, { useCallback, useState } from "react";
->>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
 import {
   ActivityIndicator,
   Image,
@@ -20,10 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-<<<<<<< HEAD
-=======
 
->>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
 import Toast from "react-native-toast-message";
 
 const ProfileScreen: React.FC = () => {
@@ -31,22 +22,6 @@ const ProfileScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-<<<<<<< HEAD
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await getUserProfile();
-        setProfile(response);
-      } catch (err) {
-        setError("Failed to load profile");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, []);
-=======
   useFocusEffect(
     useCallback(() => {
       const fetchProfile = async () => {
@@ -63,7 +38,6 @@ const ProfileScreen: React.FC = () => {
       fetchProfile();
     }, [])
   );
->>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
 
   const logoutHandler = async () => {
     console.log("Logging out...");
@@ -153,12 +127,6 @@ const ProfileScreen: React.FC = () => {
             </View>
           </View>
 
-<<<<<<< HEAD
-          <Text style={styles.userName}>Zara Larson</Text>
-          <View style={styles.emailContainer}>
-            <Text style={styles.emailText}>
-              {profile.username || "zaralarson12@gmail.com"}
-=======
           <Text style={styles.userName}>
             {" "}
             {profile.last_name + " " + profile.first_name}
@@ -166,7 +134,6 @@ const ProfileScreen: React.FC = () => {
           <View style={styles.emailContainer}>
             <Text style={styles.emailText}>
               {profile.email || "zaralarson12@gmail.com"}
->>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
             </Text>
           </View>
 

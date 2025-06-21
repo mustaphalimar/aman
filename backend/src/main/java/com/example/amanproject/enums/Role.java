@@ -1,7 +1,7 @@
 package com.example.amanproject.enums;
 
 
-public enum Role{
+public enum Role {
     ADMIN, CUSTOMER, DEVICE
 }
 
