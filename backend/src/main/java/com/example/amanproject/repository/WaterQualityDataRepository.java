@@ -18,6 +18,8 @@ public interface WaterQualityDataRepository extends JpaRepository<WaterQualityDa
     Optional<WaterQualityData> findTop1ByDeviceIdOrderByTimestampDesc(Long deviceId);
 
 
+
+
     @Query(value = """
     SELECT 
         FLOOR(HOUR(w.timestamp) / 2.4) AS period,
@@ -68,5 +70,26 @@ public interface WaterQualityDataRepository extends JpaRepository<WaterQualityDa
             @Param("deviceId") Long deviceId,
             @Param("date") LocalDate date);
 
+
+/*
+    @Query("SELECT new com.example.amanproject.dto.HistoricalWaterQualityDto(" +
+            "CAST(w.timestamp AS date), " +
+            "AVG(w.pH), " +
+            "AVG(w.turbidity), " +
+            "AVG(w.temperature), " +
+            "AVG(w.tds), " +
+            "AVG(w.chlorineLevel), " +
+            "'') " +  // Empty status initially
+            "FROM WaterQualityData w " +
+            "WHERE w.device.id = :deviceId " +
+            "AND CAST(w.timestamp AS date) BETWEEN :startDate AND :endDate " +
+            "GROUP BY CAST(w.timestamp AS date) " +
+            "ORDER BY CAST(w.timestamp AS date) DESC")
+    List<HistoricalWaterQualityDto> findDateRangeAverages(
+            @Param("deviceId") Long deviceId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    */
 
 }

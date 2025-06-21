@@ -1,7 +1,7 @@
 package com.example.amanproject.controller.ApiController;
 
 import com.example.amanproject.dto.WaterQualityStatusDto;
-import com.example.amanproject.service.WaterQualityDataService;
+import com.example.amanproject.service.mobileSevices.WaterQualityDataServiceMobile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,14 +15,12 @@ import java.util.Map;
 @PreAuthorize("hasRole('CUSTOMER')")
 public class WhaterQualityMobileController {
 
-
-
     @Autowired
-    private WaterQualityDataService waterQualityDataService;
+    private WaterQualityDataServiceMobile wterQualityDataServiceMobile;
     @GetMapping("/status/{deviceId}")
     public ResponseEntity<?> getDeviceWaterStatus(@PathVariable Long deviceId) {
         try {
-            WaterQualityStatusDto status = waterQualityDataService.getLatestDataAndStatus(deviceId);
+            WaterQualityStatusDto status = wterQualityDataServiceMobile.getLatestDataAndStatus(deviceId);
             return ResponseEntity.ok(status);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));

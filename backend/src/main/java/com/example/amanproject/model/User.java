@@ -8,9 +8,6 @@ import java.util.List;
 import lombok.*;
 
 
-@Getter
-@Setter
-
 
 @Entity
 @Table(name = "User")
