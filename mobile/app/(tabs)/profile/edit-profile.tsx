@@ -1,30 +1,3 @@
-<<<<<<< HEAD
-import React, { useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  SafeAreaView,
-  TextInput,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from "react-native";
-import { router } from "expo-router";
-import { colors } from "@/constants/tokens";
-
-const EditProfileScreen: React.FC = () => {
-  const [name, setName] = useState("Zara Larson");
-  const [email, setEmail] = useState("zaralarson12@gmail.com");
-  const [phone, setPhone] = useState("+1 234 567 8900");
-
-  const handleSave = () => {
-    // Save logic here
-    router.back();
-  };
-
-=======
 import { colors } from "@/constants/tokens";
 import { getUserProfile, updateInfoUser } from "@/Services/userServices";
 import { BlurView } from "expo-blur";
@@ -97,7 +70,6 @@ const EditProfileScreen: React.FC = () => {
     lastName: Yup.string().required("Last name is required"),
   });
 
->>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -106,47 +78,6 @@ const EditProfileScreen: React.FC = () => {
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.formContainer}>
-<<<<<<< HEAD
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Full Name</Text>
-              <TextInput
-                style={styles.input}
-                value={name}
-                onChangeText={setName}
-                placeholder="Enter your full name"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Email</Text>
-              <TextInput
-                style={styles.input}
-                value={email}
-                onChangeText={setEmail}
-                placeholder="Enter your email"
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Phone Number</Text>
-              <TextInput
-                style={styles.input}
-                value={phone}
-                onChangeText={setPhone}
-                placeholder="Enter your phone number"
-                keyboardType="phone-pad"
-              />
-            </View>
-
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-              <Text style={styles.saveButtonText}>Save Changes</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-=======
             <Formik
               enableReinitialize={true}
               initialValues={{
@@ -279,7 +210,6 @@ const EditProfileScreen: React.FC = () => {
           </View>
         </View>
       )}
->>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
     </SafeAreaView>
   );
 };
@@ -328,8 +258,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-<<<<<<< HEAD
-=======
   // Loading overlay styles
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
@@ -368,7 +296,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 20,
   },
->>>>>>> a64a2fd0f3ffec9489450683bd81b7a5dcf27a67
 });
 
 export default EditProfileScreen;

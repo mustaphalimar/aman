@@ -1,6 +1,5 @@
 package com.example.amanproject.repository;
 
-import com.example.amanproject.dto.CustomerDTO;
 import com.example.amanproject.dto.CustomerOverviewDTO;
 import com.example.amanproject.enums.PaymentStatus;
 import com.example.amanproject.enums.Role;
@@ -16,8 +15,20 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 
+    /*@Query("SELECT new com.example.amanproject.dto.CustomerOverviewDTO(" +
+            "u.name, u.email, COALESCE(d.deviceType, 'Unknown'), " +
+            "SUM(p.amount), " +
+            "COUNT(d)) " +
+            "FROM User u " +
+            "LEFT JOIN u.devices d " +
+            "LEFT JOIN Payment p ON p.user.id = u.id " +
+            "WHERE u.role = :clientRole AND p.status = :completedStatus " +
+            "GROUP BY u.id, d.deviceType")
+    List<CustomerOverviewDTO> fetchCustomerOverview(
+            @Param("completedStatus") PaymentStatus completedStatus,
+            @Param("clientRole") Role clientRole
+    );*/
 
-/*
     @Query("SELECT new com.example.amanproject.dto.CustomerOverviewDTO(" +
             " CONCAT(u.first_name, ' ', u.last_name), u.email, " +
             "'ALL', " +
@@ -31,22 +42,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<CustomerOverviewDTO> fetchCustomerOverview(
             @Param("completedStatus") PaymentStatus completedStatus,
             @Param("clientRole") Role clientRole
-    );*/
-
-
-
-    @Query("SELECT new com.example.amanproject.dto.CustomerDTO(" +
-            "u.id, u.first_name, u.last_name, u.phone, u.email, u.password, d.deviceType, SUM(p.amount), COUNT(DISTINCT d.id)) " +
-            "FROM User u " +
-            "LEFT JOIN u.devices d " +
-            "LEFT JOIN Payment p ON p.user.id = u.id " +
-            "WHERE u.role = :clientRole AND p.status = :completedStatus " +
-            "GROUP BY u.id , d.deviceType")
-    List<CustomerDTO> fetchCustomerOverview(@Param("completedStatus") PaymentStatus completedStatus,
-                                            @Param("clientRole") com.example.amanproject.model.Role clientRole);
-
-
-
+    );
 
 
 
