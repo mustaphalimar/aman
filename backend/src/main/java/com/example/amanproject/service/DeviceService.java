@@ -6,10 +6,12 @@ import com.example.amanproject.model.User;
 import com.example.amanproject.repository.DeviceRepository;
 import com.example.amanproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class DeviceService {
 
     @Autowired
