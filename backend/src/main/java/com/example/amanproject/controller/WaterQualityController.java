@@ -2,7 +2,7 @@ package com.example.amanproject.controller;
 
 
 import com.example.amanproject.dto.WaterQualityDataDto;
-import com.example.amanproject.service.mobileSevices.WaterQualityDataService;
+import com.example.amanproject.service.WaterQualityDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
