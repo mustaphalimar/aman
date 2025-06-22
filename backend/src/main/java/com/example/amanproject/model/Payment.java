@@ -1,11 +1,13 @@
 package com.example.amanproject.model;
 
 import com.example.amanproject.enums.PaymentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Payment")
@@ -13,58 +15,82 @@ import java.sql.Timestamp;
 
 
 public class Payment {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-
-    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "subscription_id", nullable = false)
-    private Subscription subscription;
+    private Device device;
 
-    @Column(nullable = false)
     private BigDecimal amount;
 
-    @CreationTimestamp
-    private Timestamp paymentDate;
-
-    //@Enumerated(EnumType.STRING)
-    //private PaymentMethod paymentMethod; // CREDIT_CARD, PAYPAL, BANK_TRANSFER
-
     @Enumerated(EnumType.STRING)
-    private PaymentStatus status; // COMPLETED, FAILED, PENDING
+    private PaymentStatus status;
 
-    // Getters & Setters
-    public User getUser() {
-        return user;
+    private LocalDateTime paymentDate = LocalDateTime.now();
+
+    public Payment() {
+    }
+
+    public Payment(Long id, User user, Device device, BigDecimal amount, PaymentStatus status, LocalDateTime paymentDate) {
+        this.id = id;
+        this.user = user;
+        this.device = device;
+        this.amount = amount;
+        this.status = status;
+        this.paymentDate = paymentDate;
     }
 
     public Long getId() {
         return id;
     }
 
-    public Subscription getSubscription() {
-        return subscription;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Device getDevice() {
+        return device;
+    }
+
+    public void setDevice(Device device) {
+        this.device = device;
     }
 
     public BigDecimal getAmount() {
         return amount;
     }
 
-    public Timestamp getPaymentDate() {
-        return paymentDate;
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 
     public PaymentStatus getStatus() {
         return status;
     }
 
+    public void setStatus(PaymentStatus status) {
+        this.status = status;
+    }
 
+    public LocalDateTime getPaymentDate() {
+        return paymentDate;
+    }
 
+    public void setPaymentDate(LocalDateTime paymentDate) {
+        this.paymentDate = paymentDate;
+    }
 }
 
