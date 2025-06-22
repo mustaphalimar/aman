@@ -1,6 +1,5 @@
 package com.example.amanproject.service;
 
-
 import com.example.amanproject.dto.CustomerOverviewDTO;
 import com.example.amanproject.enums.PaymentStatus;
 import com.example.amanproject.enums.Role;
@@ -23,9 +22,6 @@ public class CustomerService {
     public List<CustomerOverviewDTO> getCustomerOverview() {
         return userRepository.fetchCustomerOverview(
                 PaymentStatus.COMPLETED,
-                Role.CUSTOMER
-        );
+                Role.CUSTOMER);
     }
 }
-
-

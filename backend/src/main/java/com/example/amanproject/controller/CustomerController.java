@@ -21,11 +21,9 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-
     @GetMapping("/overview")
     public ResponseEntity<List<CustomerOverviewDTO>> getOverview() {
         List<CustomerOverviewDTO> customers = customerService.getCustomerOverview();
         return ResponseEntity.ok(customers);
     }
 }
-
