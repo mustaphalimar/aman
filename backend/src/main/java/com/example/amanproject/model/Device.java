@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,6 +20,7 @@ public class Device {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @Column(nullable = false)
@@ -35,9 +38,17 @@ public class Device {
     @CreationTimestamp
     private Timestamp createdAt;
 
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "device_sensor",
+            joinColumns = @JoinColumn(name = "device_id"),
+            inverseJoinColumns = @JoinColumn(name = "sensor_id")
+    )
+    private List<Sensor> sensors = new ArrayList<>();
+
     @OneToMany(mappedBy = "device", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<WaterQualityData> waterQualityData;
+    private List<WaterQualityData> waterQualityData = new ArrayList<>();
 
     // Getters & Setters
 
@@ -45,15 +56,23 @@ public class Device {
     public Device() {
     }
 
-    public Device(Long id, User user, String deviceName, String deviceType, String qrCode, DeviceStatus status, Timestamp createdAt, List<WaterQualityData> waterQualityData) {
-        this.id = id;
+    public Device(User user, String deviceName, String deviceType, List<Sensor> sensors) {
         this.user = user;
         this.deviceName = deviceName;
         this.deviceType = deviceType;
-        this.qrCode = qrCode;
-        this.status = status;
-        this.createdAt = createdAt;
-        this.waterQualityData = waterQualityData;
+        this.sensors = sensors != null ? sensors : new ArrayList<>();
+        this.status = DeviceStatus.ACTIVE;
+        this.qrCode = generateQRCode();
+    }
+
+    private String generateQRCode() {
+        return "QR_" + System.currentTimeMillis() + "_" + (int)(Math.random() * 1000);
+    }
+
+    public BigDecimal calculateTotalPrice() {
+        return sensors.stream()
+                .map(Sensor::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public Long getId() {
@@ -119,5 +138,9 @@ public class Device {
     public void setWaterQualityData(List<WaterQualityData> waterQualityData) {
         this.waterQualityData = waterQualityData;
     }
+
+    public List<Sensor> getSensors() { return sensors; }
+    public void setSensors(List<Sensor> sensors) { this.sensors = sensors; }
+
 }
 
