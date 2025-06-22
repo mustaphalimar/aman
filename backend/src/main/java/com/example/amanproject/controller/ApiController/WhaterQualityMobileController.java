@@ -1,7 +1,9 @@
 package com.example.amanproject.controller.ApiController;
 
 import com.example.amanproject.dto.WaterQualityStatusDto;
+
 import com.example.amanproject.service.mobileSevices.WaterQualityDataServiceMobile;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
