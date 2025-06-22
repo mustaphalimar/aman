@@ -20,7 +20,6 @@ public class CustomerService {
         this.userRepository = userRepository;
     }
 
-
     public List<CustomerOverviewDTO> getCustomerOverview() {
         return userRepository.fetchCustomerOverview(
                 PaymentStatus.COMPLETED,
