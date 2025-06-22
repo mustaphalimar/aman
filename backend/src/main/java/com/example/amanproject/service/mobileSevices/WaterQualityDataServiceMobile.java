@@ -8,6 +8,10 @@ import com.example.amanproject.repository.WaterQualityDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+
 @Service
 public class WaterQualityDataServiceMobile {
 
@@ -111,7 +115,7 @@ public class WaterQualityDataServiceMobile {
         );
     }
 
-
+*/
 
 
     public List<Map<String, Object>> getSensorCurves(Long deviceId, LocalDate date) {
@@ -171,7 +175,7 @@ public class WaterQualityDataServiceMobile {
     }
 
 
-
+/*
     public String evaluateWaterQuality(WaterQualityData entity) {
         return evaluateWaterQuality(
                 entity.getpH(),

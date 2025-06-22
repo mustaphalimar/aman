@@ -49,9 +49,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/waterquality/send/{deviceId}").permitAll()
 
 
+
                         .requestMatchers(HttpMethod.GET, "/api/sensors/getall").permitAll()
 
-                        // Restrict POST, PUT, DELETE to ADMIN role
+                        //mobile/whaterquality/daily/raw
+                        //whaterquality/daily/curve
+
+                        .requestMatchers("/api/mobile/whaterquality/**").hasRole("CUSTOMER")
+
+                                // Restrict POST, PUT, DELETE to ADMIN role
                         .requestMatchers(HttpMethod.POST, "/api/sensors").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/sensors/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/sensors/**").hasRole("ADMIN")

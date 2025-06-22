@@ -4,10 +4,12 @@ import {
   getSensorCurve,
 } from "@/Services/WaterQualityService";
 import { Feather } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import Constants from "expo-constants";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   FlatList,
   SafeAreaView,
@@ -50,6 +52,8 @@ const StatisticsScreen: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<Date>(new Date());
 
   const [selectedMetric, setSelectedMetric] = useState("overall");
+  const [isLoading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const deviceId = 1;
 
@@ -195,11 +199,18 @@ const StatisticsScreen: React.FC = () => {
       };
 
     return {
-      temperature: Math.max(0, 100 - Math.abs(20 - data.temperature) * 2),
-      turbidity: Math.max(0, 100 - data.turbidity * 5),
-      ph: Math.max(0, 100 - Math.abs(7.5 - data.pH) * 20),
-      tds: Math.max(0, 100 - data.tds / 10),
-      chlorineLevel: Math.max(0, 100 - Math.abs(1.5 - data.chlorineLevel) * 20),
+      temperature:
+        data.temperature != null
+          ? Math.max(0, 100 - Math.abs(20 - data.temperature) * 2)
+          : 0,
+      turbidity:
+        data.turbidity != null ? Math.max(0, 100 - data.turbidity * 5) : 0,
+      ph: data.pH != null ? Math.max(0, 100 - Math.abs(7.5 - data.pH) * 20) : 0,
+      tds: data.tds != null ? Math.max(0, 100 - data.tds / 10) : 0,
+      chlorineLevel:
+        data.chlorineLevel != null
+          ? Math.max(0, 100 - Math.abs(1.5 - data.chlorineLevel) * 20)
+          : 0,
     };
   };
 
@@ -208,7 +219,12 @@ const StatisticsScreen: React.FC = () => {
   );
 
   // Use the same functions:
-  const overallAvgQuality = calculateWaterQualityPercentage(dailyAvgData);
+  const overallAvgQuality = useMemo(
+    () => calculateWaterQualityPercentage(dailyAvgData),
+    [dailyAvgData]
+  );
+
+  //const overallAvgQuality = calculateWaterQualityPercentage(dailyAvgData);
   const avgSensorPercentages = calculateSensorPercentages(dailyAvgData);
 
   //   const sensorPercentages = calculateSensorPercentages(statusData);
@@ -282,6 +298,9 @@ const StatisticsScreen: React.FC = () => {
   useEffect(() => {
     const fetchDailyAvg = async () => {
       try {
+        setLoading(true);
+        setError(null);
+
         const selectedDate = selectedDay.toISOString().split("T")[0]; // Format: YYYY-MM-DD
         const data = await getDailyAverage(deviceId, selectedDate);
         setDailyAvgData(data);
@@ -298,6 +317,8 @@ const StatisticsScreen: React.FC = () => {
         setSensorCurveData(parsed);
       } catch (error) {
         console.error("Error fetching average daily data", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -311,15 +332,24 @@ const StatisticsScreen: React.FC = () => {
     label = "",
     subLabel = "",
   }) => {
+    // const safePercentage = isNaN(percentage)
+    //   ? 0
+    //   : Math.max(0, Math.min(100, percentage));
+
+    const safePercentage =
+      isNaN(percentage) || !isFinite(percentage)
+        ? 0
+        : Math.max(0, Math.min(100, percentage));
+
     const radius = (size - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;
     const strokeDasharray = circumference;
-    const strokeDashoffset = circumference - (percentage / 100) * circumference;
+    const strokeDashoffset =
+      circumference - (safePercentage / 100) * circumference;
 
     return (
       <View style={styles.circularProgressContainer}>
         <Svg width={size} height={size} style={styles.circularProgress}>
-          {/* Background circle */}
           <Circle
             cx={size / 2}
             cy={size / 2}
@@ -328,7 +358,7 @@ const StatisticsScreen: React.FC = () => {
             strokeWidth={strokeWidth}
             fill="transparent"
           />
-          {/* Progress circle */}
+
           <Circle
             cx={size / 2}
             cy={size / 2}
@@ -341,7 +371,7 @@ const StatisticsScreen: React.FC = () => {
             strokeLinecap="round"
             transform={`rotate(-90 ${size / 2} ${size / 2})`}
           />
-          {/* Center text */}
+
           <SvgText
             x={size / 2}
             y={size / 2 - 10}
@@ -350,7 +380,7 @@ const StatisticsScreen: React.FC = () => {
             fontWeight="bold"
             fill="#333"
           >
-            {percentage}%
+            {isNaN(percentage) ? 0 : Math.round(percentage)}%
           </SvgText>
           <SvgText
             x={size / 2}
@@ -367,6 +397,15 @@ const StatisticsScreen: React.FC = () => {
   };
 
   const MiniChart = ({ data, color = "#30b8b2" }) => {
+    if (!data || data.length === 0) {
+      return <View style={{ width: 80, height: 30 }} />;
+    }
+
+    const validData = data.filter((val) => !isNaN(val) && val !== null);
+    if (validData.length === 0) {
+      return <View style={{ width: 80, height: 30 }} />;
+    }
+
     const maxValue = Math.max(...data);
     const chartWidth = 80;
     const chartHeight = 30;
@@ -447,32 +486,14 @@ const StatisticsScreen: React.FC = () => {
         {/* Day Selection */}
         <View style={styles.daysContainer}>
           <FlatList
-            data={[1]} // Single item to render the static content
-            keyExtractor={(item) => item.toString()}
-            ListHeaderComponent={
-              <>
-                {/* Days Horizontal Scroll */}
-                <View style={styles.daysContainer}>
-                  <FlatList
-                    horizontal
-                    data={selectedDayList}
-                    keyExtractor={(item) => item.id}
-                    renderItem={renderDayItem}
-                    onEndReached={handleEndReached}
-                    onEndReachedThreshold={0.5}
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.daysList}
-                  />
-                </View>
-              </>
-            }
-            renderItem={() => null} // We don't need to render items since we're using ListHeaderComponent
-            ListFooterComponent={
-              <View style={styles.detailedMetrics}>
-                {/* Your detailed metrics content */}
-              </View>
-            }
-            contentContainerStyle={styles.scrollContent}
+            horizontal
+            data={selectedDayList}
+            keyExtractor={(item) => item.id}
+            renderItem={renderDayItem}
+            onEndReached={handleEndReached}
+            onEndReachedThreshold={0.5}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.daysList}
           />
         </View>
 
@@ -564,6 +585,27 @@ const StatisticsScreen: React.FC = () => {
           </View>
         </View>
       </ScrollView>
+
+      {isLoading && (
+        <View style={styles.loadingOverlay}>
+          <BlurView
+            intensity={5}
+            style={{
+              ...StyleSheet.absoluteFillObject,
+              overflow: "hidden",
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+            }}
+          />
+          <View style={styles.loadingCard}>
+            <ActivityIndicator size="large" color="#30b8b2" />
+            <Text style={styles.loadingTitle}>Updating Profile </Text>
+            <Text style={styles.loadingSubtitle}>
+              We are will signing you in a moment.
+            </Text>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -745,6 +787,44 @@ const styles = StyleSheet.create({
   activeMonthNameText: {
     color: "#fff",
     fontWeight: "600",
+  },
+  // Loading overlay styles
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(30, 42, 71, 0.8)", // Dark blue with opacity
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+    backdropFilter: "blur(10px)", // Add blur effect
+  },
+  loadingCard: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 30,
+    width: "80%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  loadingTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#1e2a47",
+    marginTop: 20,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  loadingSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
+    lineHeight: 20,
   },
 });
 

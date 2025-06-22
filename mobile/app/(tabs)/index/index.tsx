@@ -4,7 +4,7 @@ import { Feather } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -84,15 +84,51 @@ const HomeScreen: React.FC = () => {
 
   const [isMounted, setIsMounted] = useState(false);
 
-  const { data: db, isLoading: isl } = useQuery({
-    queryKey: ["dashboard_data"],
+  const {
+    data: db,
+    isLoading: isl,
+    error,
+  } = useQuery({
+    queryKey: ["dashboard_data", deviceId],
     queryFn: async () => {
-      const db = await getLatestWaterStatus(deviceId);
-      setColorStatus(getStatusColor(db?.status));
-      return db;
+      try {
+        const result = await getLatestWaterStatus(deviceId);
+        console.log("Fetched data:", result);
+        return result;
+      } catch (error) {
+        console.error("Error in queryFn:", error);
+        throw error;
+      }
     },
     refetchInterval: 5000,
+    staleTime: 0, // Always consider data stale
+    cacheTime: 0, // Don't cache data
+    retry: 3,
+    retryDelay: 1000,
+    onSuccess: (data) => {
+      console.log("Query successful, data:", data);
+      if (data?.status) {
+        setColorStatus(getStatusColor(data.status));
+      }
+    },
+    onError: (error) => {
+      console.error("Query error:", error);
+    },
   });
+
+  // Alternative approach - using useEffect with React Query data
+  useEffect(() => {
+    if (db?.status) {
+      const newColorStatus = getStatusColor(db.status);
+      setColorStatus(newColorStatus);
+      console.log("Updated color status:", newColorStatus);
+    }
+  }, [db?.status]);
+
+  // Handle error state
+  if (error) {
+    console.error("Data fetching error:", error);
+  }
 
   // useEffect(() => {
   //   setIsMounted(true);
