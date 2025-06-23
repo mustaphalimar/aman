@@ -1,3 +1,4 @@
+import { useDeviceId } from "@/hooks/use-device-id";
 import { WaterQualityAverages } from "@/intarfaces";
 import {
   getDailyAverage,
@@ -61,8 +62,9 @@ const StatisticsScreen: React.FC = () => {
   const [selectedDayList, setSelectedDayList] = useState<DayItem[]>([]);
   const [selectedDay, setSelectedDay] = useState<Date>(new Date());
   const [selectedMetric, setSelectedMetric] = useState("overall");
+  const useDeviceIdHook = useDeviceId();
 
-  const deviceId = 1;
+  const deviceId = useDeviceIdHook.deviceId;
 
   const formatDateSafely = (date: Date | string | null | undefined): string => {
     let validDate: Date;
@@ -123,6 +125,7 @@ const StatisticsScreen: React.FC = () => {
     queryKey: ["sensorCurve", deviceId, formatDateSafely(selectedDay)],
     queryFn: async () => {
       const selectedDate = formatDateSafely(selectedDay);
+      console.log({ selectedDay });
       return await getSensorCurve(deviceId, selectedDate);
     },
     enabled: !!selectedDay,
@@ -262,7 +265,7 @@ const StatisticsScreen: React.FC = () => {
       prev.map((day) => ({
         ...day,
         isSelected: day.id === id,
-      }))
+      })),
     );
 
     setSelectedDay(selected.date);
@@ -280,7 +283,7 @@ const StatisticsScreen: React.FC = () => {
 
   // Calculate water quality percentage based on your backend logic
   const calculateWaterQualityPercentage = (
-    data: WaterQualityAverages | null | undefined
+    data: WaterQualityAverages | null | undefined,
   ) => {
     if (!data) return 100;
 
@@ -315,7 +318,7 @@ const StatisticsScreen: React.FC = () => {
 
   // Calculate individual sensor percentages
   const calculateSensorPercentages = (
-    data: WaterQualityAverages | null | undefined
+    data: WaterQualityAverages | null | undefined,
   ) => {
     if (!data)
       return {
@@ -344,12 +347,12 @@ const StatisticsScreen: React.FC = () => {
 
   const overallAvgQuality = useMemo(
     () => calculateWaterQualityPercentage(dailyAvgData),
-    [dailyAvgData]
+    [dailyAvgData],
   );
 
   const avgSensorPercentages = useMemo(
     () => calculateSensorPercentages(dailyAvgData),
-    [dailyAvgData]
+    [dailyAvgData],
   );
 
   const metricsData: MetricData[] = [
@@ -477,7 +480,8 @@ const StatisticsScreen: React.FC = () => {
 
     // Filter out invalid values (NaN, null, undefined)
     const validData = data.filter(
-      (val) => val !== null && val !== undefined && !isNaN(val) && isFinite(val)
+      (val) =>
+        val !== null && val !== undefined && !isNaN(val) && isFinite(val),
     );
 
     if (validData.length === 0) {
@@ -505,8 +509,8 @@ const StatisticsScreen: React.FC = () => {
           isFinite(value)
             ? value
             : validData.length > 0
-            ? validData[0]
-            : 0;
+              ? validData[0]
+              : 0;
 
         const x =
           data.length > 1

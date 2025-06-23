@@ -1,3 +1,4 @@
+import { useDeviceId } from "@/hooks/use-device-id";
 import { loginUser } from "@/Services/userServices";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { BarCodeScannerResult } from "expo-barcode-scanner";
@@ -32,6 +33,7 @@ export default function ScannerScreen() {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [enableTorch, setEnableTorch] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
+  const useDeviceIdHook = useDeviceId();
 
   useEffect(() => {
     if (!permission) {
@@ -51,6 +53,8 @@ export default function ScannerScreen() {
 
       if (deviceData) {
         // Show device detected message
+        useDeviceIdHook.setDeviceId(deviceData.deviceId);
+
         Toast.show({
           type: "info",
           text1: "Device Detected!",
@@ -93,8 +97,7 @@ export default function ScannerScreen() {
         deviceInfo.model &&
         deviceInfo.serialNumber &&
         deviceInfo.email &&
-        deviceInfo.password &&
-        deviceInfo.deviceId.startsWith("WQ") // Water Quality device prefix
+        deviceInfo.password
       ) {
         return {
           deviceId: deviceInfo.deviceId,
@@ -184,7 +187,7 @@ export default function ScannerScreen() {
               });
             },
           },
-        ]
+        ],
       );
     }
   };
