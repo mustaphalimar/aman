@@ -95,12 +95,6 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                        // .requestMatchers("api/customers/overview").permitAll()
-                        .requestMatchers("api/customers/create").permitAll()
-
-                        // .requestMatchers("api/customers/overview").hasRole(Role.ADMIN.toString())
-                        .anyRequest().authenticated())
-
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setStatus(HttpStatus.FORBIDDEN.value());
