@@ -87,8 +87,6 @@ export default function ScannerScreen() {
 
   const validateDeviceQRCode = (qrData: string): DeviceData | null => {
     try {
-      // Expected QR format: JSON with device info and credentials
-      // Example: {"deviceId":"WQ001234","model":"AquaSensor Pro","serialNumber":"AS2024001234","version":"1.2","email":"hamza@gmail.com","password":"123456"}
       const deviceInfo = JSON.parse(qrData);
 
       // Validate required fields including authentication
