@@ -1,7 +1,9 @@
 package com.example.amanproject.controller;
 
 
-import com.example.amanproject.dto.DeviceDTO;
+import com.example.amanproject.dto.device.DeviceDTO;
+import com.example.amanproject.enums.DeviceStatus;
+import com.example.amanproject.model.Device;
 import com.example.amanproject.service.DeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,16 @@ public class DeviceController {
     private DeviceService deviceService;
 
 
+
+    //change status of an device
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Device> updateDeviceStatus(
+            @PathVariable Long id,
+            @RequestParam("status") DeviceStatus status
+    ) {
+        Device device = deviceService.updateDeviceStatus(id, status);
+        return ResponseEntity.ok(device);
+    }
 
     @GetMapping
     public ResponseEntity<List<DeviceDTO>> getAll() {

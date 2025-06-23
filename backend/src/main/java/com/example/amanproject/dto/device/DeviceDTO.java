@@ -1,4 +1,4 @@
-package com.example.amanproject.dto;
+package com.example.amanproject.dto.device;
 
 import com.example.amanproject.enums.DeviceStatus;
 import lombok.Data;
