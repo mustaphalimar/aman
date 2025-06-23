@@ -70,6 +70,7 @@ public interface WaterQualityDataRepository extends JpaRepository<WaterQualityDa
             @Param("deviceId") Long deviceId,
             @Param("date") LocalDate date);
 
+
 /*
     @Query("SELECT new com.example.amanproject.dto.HistoricalWaterQualityDto(" +
             "CAST(w.timestamp AS date), " +

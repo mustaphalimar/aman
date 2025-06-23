@@ -9,6 +9,9 @@ dist/
 web-build/
 expo-env.d.ts
 
+.idea
+
+mobile/bun.lock
 # Native
 .kotlin/
 *.orig.*

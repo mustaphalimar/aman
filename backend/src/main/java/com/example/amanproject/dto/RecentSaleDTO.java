@@ -10,12 +10,12 @@ import java.time.LocalDateTime;
 public class RecentSaleDTO {
     private String customerName;
     private BigDecimal amount;
-    private Timestamp paymentDate;
+    private LocalDateTime paymentDate;
 
 
     public RecentSaleDTO() {}
 
-    public RecentSaleDTO(String customerName, BigDecimal amount, Timestamp paymentDate) {
+    public RecentSaleDTO(String customerName, BigDecimal amount, LocalDateTime paymentDate) {
         this.customerName = customerName;
         this.amount = amount;
         this.paymentDate = paymentDate;
@@ -29,7 +29,7 @@ public class RecentSaleDTO {
         return amount;
     }
 
-    public Timestamp getPaymentDate() {
+    public LocalDateTime getPaymentDate() {
         return paymentDate;
     }
 
@@ -41,7 +41,7 @@ public class RecentSaleDTO {
         this.amount = amount;
     }
 
-    public void setPaymentDate(Timestamp paymentDate) {
+    public void setPaymentDate(LocalDateTime paymentDate) {
         this.paymentDate = paymentDate;
     }
 }
