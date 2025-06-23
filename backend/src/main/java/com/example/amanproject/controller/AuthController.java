@@ -47,12 +47,10 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> loginRequest) {
-
-
         try {
             String email = loginRequest.get("email");
             String password = loginRequest.get("password");
-            System.out.println("login info : " + email + " | "+password);
+            System.out.println("login info : " + email + " | " + password);
             String token = authService.login(email, password);
 
             String role = jwtUtil.extractRole(token);
@@ -67,28 +65,28 @@ public class AuthController {
                     "token", token,
                     "status", "success",
                     "role", role,
-                    "message", message
-            ));
+                    "message", message));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
                     "status", "error",
-                    "message", e.getMessage()
-            ));
+                    "message", e.getMessage()));
         }
 
-        /*try {
-            String token = authService.login(loginRequest.get("username"), loginRequest.get("password"));
-            return ResponseEntity.ok(Map.of(
-                    "token", token,
-                    "status", "success",
-                    "message", "Login successful"
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-                    "status", "error",
-                    "message", e.getMessage()
-            ));
-        }*/
+        /*
+         * try {
+         * String token = authService.login(loginRequest.get("username"),
+         * loginRequest.get("password"));
+         * return ResponseEntity.ok(Map.of(
+         * "token", token,
+         * "status", "success",
+         * "message", "Login successful"
+         * ));
+         * } catch (Exception e) {
+         * return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+         * "status", "error",
+         * "message", e.getMessage()
+         * ));
+         * }
+         */
     }
 }
-
