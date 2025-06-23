@@ -39,6 +39,16 @@ public class WaterQualityDataServiceMobile {
 
 
     public String evaluateWaterQuality(WaterQualityData data) {
+        double tds = data.getTds();
+
+        if (tds > 1000) {
+            return "danger";
+        } else if (tds > 500) {
+            return "warning";
+        } else {
+            return "normal";
+        }
+        /*
         int dangerCount = 0;
         int warningCount = 0;
 
@@ -71,6 +81,8 @@ public class WaterQualityDataServiceMobile {
         if (dangerCount > 0) return "danger";
         else if (warningCount > 0) return "warning";
         else return "normal";
+        */
+
     }
 
 /*
