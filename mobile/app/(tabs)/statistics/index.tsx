@@ -4,10 +4,13 @@ import {
   getSensorCurve,
 } from "@/Services/WaterQualityService";
 import { Feather } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
+import { BlurView } from "expo-blur";
 import Constants from "expo-constants";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   FlatList,
   SafeAreaView,
@@ -41,17 +44,145 @@ interface DayItem {
   isToday: boolean;
 }
 
-const StatisticsScreen: React.FC = () => {
-  const [statusData, setStatusData] = useState<WaterQualityAverages | null>(
-    null
-  );
+interface CircularProgressProps {
+  percentage?: number;
+  size?: number;
+  strokeWidth?: number;
+  label?: string;
+  subLabel?: string;
+}
 
+interface MiniChartProps {
+  data: number[];
+  color?: string;
+}
+
+const StatisticsScreen: React.FC = () => {
   const [selectedDayList, setSelectedDayList] = useState<DayItem[]>([]);
   const [selectedDay, setSelectedDay] = useState<Date>(new Date());
-
   const [selectedMetric, setSelectedMetric] = useState("overall");
 
   const deviceId = 1;
+
+  const formatDateSafely = (date: Date | string | null | undefined): string => {
+    let validDate: Date;
+
+    if (!date) {
+      console.warn("No date provided, using today");
+      validDate = new Date();
+    } else if (typeof date === "string") {
+      validDate = new Date(date);
+    } else if (date instanceof Date) {
+      validDate = date;
+    } else {
+      console.warn("Invalid date type provided, using today");
+      validDate = new Date();
+    }
+
+    if (isNaN(validDate.getTime())) {
+      console.warn("Invalid date provided, using today");
+      validDate = new Date();
+    }
+
+    const year = validDate.getFullYear();
+    const month = String(validDate.getMonth() + 1).padStart(2, "0");
+    const day = String(validDate.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  // React Query for daily average data
+  const {
+    data: dailyAvgData,
+    isLoading: isDailyAvgLoading,
+    error: dailyAvgError,
+    refetch: refetchDailyAvg,
+  } = useQuery({
+    queryKey: ["dailyAverage", deviceId, formatDateSafely(selectedDay)],
+    queryFn: async () => {
+      const selectedDate = formatDateSafely(selectedDay);
+      console.log("Formatted date for API:", selectedDate);
+      return await getDailyAverage(deviceId, selectedDate);
+    },
+    enabled: !!selectedDay,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    retry: 2,
+    onError: (error) => {
+      console.error("Error fetching daily average data:", error);
+    },
+  });
+
+  // React Query for sensor curve data
+  const {
+    data: sensorCurveRawData,
+    isLoading: isCurveLoading,
+    error: curveError,
+    refetch: refetchCurve,
+  } = useQuery({
+    queryKey: ["sensorCurve", deviceId, formatDateSafely(selectedDay)],
+    queryFn: async () => {
+      const selectedDate = formatDateSafely(selectedDay);
+      return await getSensorCurve(deviceId, selectedDate);
+    },
+    enabled: !!selectedDay,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    retry: 2,
+    onError: (error) => {
+      console.error("Error fetching sensor curve data:", error);
+    },
+  });
+
+  // Process sensor curve data
+  const sensorCurveData = useMemo(() => {
+    if (!sensorCurveRawData || !Array.isArray(sensorCurveRawData)) {
+      return {
+        pH: [],
+        turbidity: [],
+        temperature: [],
+        tds: [],
+        chlorineLevel: [],
+      };
+    }
+
+    return {
+      pH: sensorCurveRawData.map((entry) => {
+        const value = entry?.pH;
+        return value !== null && value !== undefined && !isNaN(value)
+          ? Number(value)
+          : 0;
+      }),
+      turbidity: sensorCurveRawData.map((entry) => {
+        const value = entry?.turbidity;
+        return value !== null && value !== undefined && !isNaN(value)
+          ? Number(value)
+          : 0;
+      }),
+      temperature: sensorCurveRawData.map((entry) => {
+        const value = entry?.temperature;
+        return value !== null && value !== undefined && !isNaN(value)
+          ? Number(value)
+          : 0;
+      }),
+      tds: sensorCurveRawData.map((entry) => {
+        const value = entry?.tds;
+        return value !== null && value !== undefined && !isNaN(value)
+          ? Number(value)
+          : 0;
+      }),
+      chlorineLevel: sensorCurveRawData.map((entry) => {
+        const value = entry?.chlorineLevel;
+        return value !== null && value !== undefined && !isNaN(value)
+          ? Number(value)
+          : 0;
+      }),
+    };
+  }, [sensorCurveRawData]);
+
+  // Combined loading state
+  const isLoading = isDailyAvgLoading || isCurveLoading;
+  const hasError = dailyAvgError || curveError;
 
   // Initialize days
   useEffect(() => {
@@ -87,7 +218,7 @@ const StatisticsScreen: React.FC = () => {
     }
 
     setSelectedDayList(newDays);
-    setSelectedDay(today); // <-- Set the actual selected date for use in API
+    setSelectedDay(today);
   };
 
   const generateMoreDays = (count: number = 14) => {
@@ -96,20 +227,13 @@ const StatisticsScreen: React.FC = () => {
     const oldestDay = selectedDayList[selectedDayList.length - 1];
     const newDays: DayItem[] = [];
 
-    // Generate more days going backwards from the oldest day
     for (let i = 1; i <= count; i++) {
       const date = new Date(oldestDay.date);
       date.setDate(date.getDate() - i);
 
       const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
       const dayNumber = date.getDate().toString().padStart(2, "0");
-      //const month = (date.getMonth() + 1).toString().padStart(2, "0");
       const monthName = date.toLocaleDateString("en-US", { month: "short" });
-
-      const year = date.getFullYear();
-
-      // Create a more unique key by including timestamp
-      // const uniqueKey = `day-${year}-${month}-${dayNumber}-${date.getTime()}`;
 
       const uniqueKey = `day-${date.getFullYear()}-${(date.getMonth() + 1)
         .toString()
@@ -120,7 +244,7 @@ const StatisticsScreen: React.FC = () => {
         label: `${dayName} ${dayNumber}`,
         dayName: dayName,
         dayNumber: dayNumber,
-        monthName: monthName, // Add month name
+        monthName: monthName,
         date: date,
         isSelected: false,
         isToday: false,
@@ -141,16 +265,22 @@ const StatisticsScreen: React.FC = () => {
       }))
     );
 
-    setSelectedDay(selected.date); // <-- Track selected date for fetching
+    setSelectedDay(selected.date);
   };
 
   const handleEndReached = () => {
     generateMoreDays(14);
   };
 
+  // Retry function for failed requests
+  const handleRetry = () => {
+    refetchDailyAvg();
+    refetchCurve();
+  };
+
   // Calculate water quality percentage based on your backend logic
   const calculateWaterQualityPercentage = (
-    data: WaterQualityAverages | null
+    data: WaterQualityAverages | null | undefined
   ) => {
     if (!data) return 100;
 
@@ -184,7 +314,9 @@ const StatisticsScreen: React.FC = () => {
   };
 
   // Calculate individual sensor percentages
-  const calculateSensorPercentages = (data: WaterQualityAverages | null) => {
+  const calculateSensorPercentages = (
+    data: WaterQualityAverages | null | undefined
+  ) => {
     if (!data)
       return {
         temperature: 100,
@@ -195,24 +327,30 @@ const StatisticsScreen: React.FC = () => {
       };
 
     return {
-      temperature: Math.max(0, 100 - Math.abs(20 - data.temperature) * 2),
-      turbidity: Math.max(0, 100 - data.turbidity * 5),
-      ph: Math.max(0, 100 - Math.abs(7.5 - data.pH) * 20),
-      tds: Math.max(0, 100 - data.tds / 10),
-      chlorineLevel: Math.max(0, 100 - Math.abs(1.5 - data.chlorineLevel) * 20),
+      temperature:
+        data.temperature != null
+          ? Math.max(0, 100 - Math.abs(20 - data.temperature) * 2)
+          : 0,
+      turbidity:
+        data.turbidity != null ? Math.max(0, 100 - data.turbidity * 5) : 0,
+      ph: data.pH != null ? Math.max(0, 100 - Math.abs(7.5 - data.pH) * 20) : 0,
+      tds: data.tds != null ? Math.max(0, 100 - data.tds / 10) : 0,
+      chlorineLevel:
+        data.chlorineLevel != null
+          ? Math.max(0, 100 - Math.abs(1.5 - data.chlorineLevel) * 20)
+          : 0,
     };
   };
 
-  const [dailyAvgData, setDailyAvgData] = useState<WaterQualityAverages | null>(
-    null
+  const overallAvgQuality = useMemo(
+    () => calculateWaterQualityPercentage(dailyAvgData),
+    [dailyAvgData]
   );
 
-  // Use the same functions:
-  const overallAvgQuality = calculateWaterQualityPercentage(dailyAvgData);
-  const avgSensorPercentages = calculateSensorPercentages(dailyAvgData);
-
-  //   const sensorPercentages = calculateSensorPercentages(statusData);
-  //   const overallQuality = calculateWaterQualityPercentage(statusData);
+  const avgSensorPercentages = useMemo(
+    () => calculateSensorPercentages(dailyAvgData),
+    [dailyAvgData]
+  );
 
   const metricsData: MetricData[] = [
     {
@@ -226,7 +364,7 @@ const StatisticsScreen: React.FC = () => {
     {
       id: "temperature",
       label: "Temperature",
-      value: statusData ? `${statusData.temperature}°C` : "--",
+      value: dailyAvgData ? `${dailyAvgData.temperature}°C` : "--",
       color: "#ff6b6b",
       isActive: selectedMetric === "temperature",
       percentage: avgSensorPercentages.temperature,
@@ -234,7 +372,7 @@ const StatisticsScreen: React.FC = () => {
     {
       id: "turbidity",
       label: "Turbidity",
-      value: statusData ? `${statusData.turbidity}` : "--",
+      value: dailyAvgData ? `${dailyAvgData.turbidity}` : "--",
       color: "#4ecdc4",
       isActive: selectedMetric === "turbidity",
       percentage: avgSensorPercentages.turbidity,
@@ -242,7 +380,7 @@ const StatisticsScreen: React.FC = () => {
     {
       id: "ph",
       label: "pH",
-      value: statusData ? `${statusData.pH}` : "--",
+      value: dailyAvgData ? `${dailyAvgData.pH}` : "--",
       color: "#45b7d1",
       isActive: selectedMetric === "ph",
       percentage: avgSensorPercentages.ph,
@@ -250,7 +388,7 @@ const StatisticsScreen: React.FC = () => {
     {
       id: "tds",
       label: "TDS",
-      value: statusData ? `${statusData.tds}` : "--",
+      value: dailyAvgData ? `${dailyAvgData.tds}` : "--",
       color: "#a78bfa",
       isActive: selectedMetric === "tds",
       percentage: avgSensorPercentages.tds,
@@ -258,51 +396,12 @@ const StatisticsScreen: React.FC = () => {
     {
       id: "chlorineLevel",
       label: "Chlorine",
-      value: statusData ? `${statusData.chlorineLevel}` : "--",
+      value: dailyAvgData ? `${dailyAvgData.chlorineLevel}` : "--",
       color: "#f9c74f",
       isActive: selectedMetric === "chlorineLevel",
       percentage: avgSensorPercentages.chlorineLevel,
     },
   ];
-
-  const [sensorCurveData, setSensorCurveData] = useState<{
-    pH: number[];
-    turbidity: number[];
-    temperature: number[];
-    tds: number[];
-    chlorineLevel: number[];
-  }>({
-    pH: [],
-    turbidity: [],
-    temperature: [],
-    tds: [],
-    chlorineLevel: [],
-  });
-
-  useEffect(() => {
-    const fetchDailyAvg = async () => {
-      try {
-        const selectedDate = selectedDay.toISOString().split("T")[0]; // Format: YYYY-MM-DD
-        const data = await getDailyAverage(deviceId, selectedDate);
-        setDailyAvgData(data);
-
-        const dataCurve = await getSensorCurve(deviceId, selectedDate);
-        const parsed = {
-          pH: dataCurve.map((entry) => entry.pH ?? 0),
-          turbidity: dataCurve.map((entry) => entry.turbidity ?? 0),
-          temperature: dataCurve.map((entry) => entry.temperature ?? 0),
-          tds: dataCurve.map((entry) => entry.tds ?? 0),
-          chlorineLevel: dataCurve.map((entry) => entry.chlorineLevel ?? 0),
-        };
-
-        setSensorCurveData(parsed);
-      } catch (error) {
-        console.error("Error fetching average daily data", error);
-      }
-    };
-
-    fetchDailyAvg();
-  }, [selectedDay]);
 
   const CircularProgress = ({
     percentage = 75,
@@ -311,15 +410,20 @@ const StatisticsScreen: React.FC = () => {
     label = "",
     subLabel = "",
   }) => {
+    const safePercentage =
+      isNaN(percentage) || !isFinite(percentage)
+        ? 0
+        : Math.max(0, Math.min(100, percentage));
+
     const radius = (size - strokeWidth) / 2;
     const circumference = 2 * Math.PI * radius;
     const strokeDasharray = circumference;
-    const strokeDashoffset = circumference - (percentage / 100) * circumference;
+    const strokeDashoffset =
+      circumference - (safePercentage / 100) * circumference;
 
     return (
       <View style={styles.circularProgressContainer}>
         <Svg width={size} height={size} style={styles.circularProgress}>
-          {/* Background circle */}
           <Circle
             cx={size / 2}
             cy={size / 2}
@@ -328,7 +432,7 @@ const StatisticsScreen: React.FC = () => {
             strokeWidth={strokeWidth}
             fill="transparent"
           />
-          {/* Progress circle */}
+
           <Circle
             cx={size / 2}
             cy={size / 2}
@@ -341,7 +445,7 @@ const StatisticsScreen: React.FC = () => {
             strokeLinecap="round"
             transform={`rotate(-90 ${size / 2} ${size / 2})`}
           />
-          {/* Center text */}
+
           <SvgText
             x={size / 2}
             y={size / 2 - 10}
@@ -350,7 +454,7 @@ const StatisticsScreen: React.FC = () => {
             fontWeight="bold"
             fill="#333"
           >
-            {percentage}%
+            {isNaN(percentage) ? 0 : Math.round(percentage)}%
           </SvgText>
           <SvgText
             x={size / 2}
@@ -367,15 +471,61 @@ const StatisticsScreen: React.FC = () => {
   };
 
   const MiniChart = ({ data, color = "#30b8b2" }) => {
-    const maxValue = Math.max(...data);
+    if (!data || data.length === 0) {
+      return <View style={{ width: 80, height: 30 }} />;
+    }
+
+    // Filter out invalid values (NaN, null, undefined)
+    const validData = data.filter(
+      (val) => val !== null && val !== undefined && !isNaN(val) && isFinite(val)
+    );
+
+    if (validData.length === 0) {
+      return <View style={{ width: 80, height: 30 }} />;
+    }
+
+    const maxValue = Math.max(...validData);
+    const minValue = Math.min(...validData);
+
+    // Handle case where all values are the same
+    const range = maxValue - minValue;
+    const effectiveRange = range === 0 ? 1 : range;
+
     const chartWidth = 80;
     const chartHeight = 30;
 
+    // Create points using original data but with safe calculations
     const points = data
       .map((value, index) => {
-        const x = (index / (data.length - 1)) * chartWidth;
-        const y = chartHeight - (value / maxValue) * chartHeight;
-        return `${x},${y}`;
+        // Skip invalid values by using a previous valid value or 0
+        const safeValue =
+          value !== null &&
+          value !== undefined &&
+          !isNaN(value) &&
+          isFinite(value)
+            ? value
+            : validData.length > 0
+            ? validData[0]
+            : 0;
+
+        const x =
+          data.length > 1
+            ? (index / (data.length - 1)) * chartWidth
+            : chartWidth / 2;
+
+        // Normalize the value between 0 and chartHeight
+        const normalizedValue =
+          range === 0
+            ? chartHeight / 2
+            : ((safeValue - minValue) / effectiveRange) * chartHeight;
+
+        const y = chartHeight - normalizedValue;
+
+        // Ensure x and y are valid numbers
+        const safeX = isFinite(x) ? x : 0;
+        const safeY = isFinite(y) ? y : chartHeight / 2;
+
+        return `${safeX},${safeY}`;
       })
       .join(" ");
 
@@ -430,6 +580,17 @@ const StatisticsScreen: React.FC = () => {
     </TouchableOpacity>
   );
 
+  // Error state component
+  const ErrorState = () => (
+    <View style={styles.errorContainer}>
+      <Text style={styles.errorTitle}>Failed to load data</Text>
+      <Text style={styles.errorSubtitle}>Please try again</Text>
+      <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
+        <Text style={styles.retryButtonText}>Retry</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -447,123 +608,133 @@ const StatisticsScreen: React.FC = () => {
         {/* Day Selection */}
         <View style={styles.daysContainer}>
           <FlatList
-            data={[1]} // Single item to render the static content
-            keyExtractor={(item) => item.toString()}
-            ListHeaderComponent={
-              <>
-                {/* Days Horizontal Scroll */}
-                <View style={styles.daysContainer}>
-                  <FlatList
-                    horizontal
-                    data={selectedDayList}
-                    keyExtractor={(item) => item.id}
-                    renderItem={renderDayItem}
-                    onEndReached={handleEndReached}
-                    onEndReachedThreshold={0.5}
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.daysList}
-                  />
-                </View>
-              </>
-            }
-            renderItem={() => null} // We don't need to render items since we're using ListHeaderComponent
-            ListFooterComponent={
-              <View style={styles.detailedMetrics}>
-                {/* Your detailed metrics content */}
-              </View>
-            }
-            contentContainerStyle={styles.scrollContent}
+            horizontal
+            data={selectedDayList}
+            keyExtractor={(item) => item.id}
+            renderItem={renderDayItem}
+            onEndReached={handleEndReached}
+            onEndReachedThreshold={0.5}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.daysList}
           />
         </View>
 
-        {/* Circular Progress Section */}
-        <View style={{ margin: 15 }}>
-          <View style={styles.progressSection}>
-            <CircularProgress
-              percentage={
-                selectedMetric === "overall"
-                  ? overallAvgQuality
-                  : metricsData.find((m) => m.id === selectedMetric)
-                      ?.percentage || 0
-              }
-              label={
-                selectedMetric === "overall"
-                  ? "Overall"
-                  : metricsData.find((m) => m.id === selectedMetric)?.label ||
-                    ""
-              }
-            />
+        {/* Error State */}
+        {hasError && !isLoading && <ErrorState />}
 
-            <View style={[styles.metricsLegend]}>
-              {metricsData.map((metric) => (
-                <TouchableOpacity
-                  key={metric.id}
-                  style={styles.legendItem}
-                  onPress={() => setSelectedMetric(metric.id)}
-                >
-                  <View
-                    style={[
-                      styles.legendDot,
-                      { backgroundColor: metric.color },
-                      metric.isActive && styles.activeLegendDot,
-                    ]}
-                  />
-                  <Text
-                    style={[
-                      styles.legendLabel,
-                      metric.isActive && styles.activeLegendLabel,
-                    ]}
+        {/* Main Content */}
+        {!hasError && (
+          <View style={{ margin: 15 }}>
+            {/* Circular Progress Section */}
+            <View style={styles.progressSection}>
+              <CircularProgress
+                percentage={
+                  selectedMetric === "overall"
+                    ? overallAvgQuality
+                    : metricsData.find((m) => m.id === selectedMetric)
+                        ?.percentage || 0
+                }
+                label={
+                  selectedMetric === "overall"
+                    ? "Overall"
+                    : metricsData.find((m) => m.id === selectedMetric)?.label ||
+                      ""
+                }
+              />
+
+              <View style={[styles.metricsLegend]}>
+                {metricsData.map((metric) => (
+                  <TouchableOpacity
+                    key={metric.id}
+                    style={styles.legendItem}
+                    onPress={() => setSelectedMetric(metric.id)}
                   >
-                    {metric.label}
+                    <View
+                      style={[
+                        styles.legendDot,
+                        { backgroundColor: metric.color },
+                        metric.isActive && styles.activeLegendDot,
+                      ]}
+                    />
+                    <Text
+                      style={[
+                        styles.legendLabel,
+                        metric.isActive && styles.activeLegendLabel,
+                      ]}
+                    >
+                      {metric.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Detailed Metrics */}
+            <View style={styles.detailedMetrics}>
+              <View style={styles.metricRow}>
+                <View style={styles.metricInfo}>
+                  <Text style={styles.metricLabel}>pH</Text>
+                  <Text style={styles.metricTimeframe}>6h 30m</Text>
+                  <Text style={styles.metricValue}>
+                    {dailyAvgData ? dailyAvgData.pH : "--"}
                   </Text>
-                </TouchableOpacity>
-              ))}
+                </View>
+                <MiniChart data={sensorCurveData.pH} color="#4ecdc4" />
+              </View>
+
+              <View style={styles.metricRow}>
+                <View style={styles.metricInfo}>
+                  <Text style={styles.metricLabel}>TDS</Text>
+                  <Text style={styles.metricTimeframe}>6h 30m</Text>
+                  <Text style={styles.metricValue}>
+                    {dailyAvgData ? dailyAvgData.tds : "--"}
+                  </Text>
+                </View>
+                <MiniChart
+                  data={sensorCurveData.tds.map((x) => x * 0.8)}
+                  color="#45b7d1"
+                />
+              </View>
+
+              <View style={styles.metricRow}>
+                <View style={styles.metricInfo}>
+                  <Text style={styles.metricLabel}>Chlorine Level</Text>
+                  <Text style={styles.metricTimeframe}>6h 30m</Text>
+                  <Text style={styles.metricValue}>
+                    {dailyAvgData ? dailyAvgData.chlorineLevel : "--"}
+                  </Text>
+                </View>
+                <MiniChart
+                  data={sensorCurveData.chlorineLevel.map((x) => x * 1.2)}
+                  color="#f9c74f"
+                />
+              </View>
             </View>
           </View>
+        )}
+      </ScrollView>
 
-          {/* Detailed Metrics */}
-          <View style={styles.detailedMetrics}>
-            <View style={styles.metricRow}>
-              <View style={styles.metricInfo}>
-                <Text style={styles.metricLabel}>pH</Text>
-                <Text style={styles.metricTimeframe}>6h 30m</Text>
-                <Text style={styles.metricValue}>
-                  {dailyAvgData ? dailyAvgData.pH : "--"}
-                </Text>
-              </View>
-              <MiniChart data={sensorCurveData.pH} color="#4ecdc4" />
-            </View>
-
-            <View style={styles.metricRow}>
-              <View style={styles.metricInfo}>
-                <Text style={styles.metricLabel}>TDS</Text>
-                <Text style={styles.metricTimeframe}>6h 30m</Text>
-                <Text style={styles.metricValue}>
-                  {dailyAvgData ? dailyAvgData.tds : "--"}
-                </Text>
-              </View>
-              <MiniChart
-                data={sensorCurveData.tds.map((x) => x * 0.8)}
-                color="#45b7d1"
-              />
-            </View>
-
-            <View style={styles.metricRow}>
-              <View style={styles.metricInfo}>
-                <Text style={styles.metricLabel}>Chlorine Level</Text>
-                <Text style={styles.metricTimeframe}>6h 30m</Text>
-                <Text style={styles.metricValue}>
-                  {dailyAvgData ? dailyAvgData.chlorineLevel : "--"}
-                </Text>
-              </View>
-              <MiniChart
-                data={sensorCurveData.chlorineLevel.map((x) => x * 1.2)}
-                color="#f9c74f"
-              />
-            </View>
+      {/* Loading Overlay */}
+      {isLoading && (
+        <View style={styles.loadingOverlay}>
+          <BlurView
+            intensity={5}
+            style={{
+              ...StyleSheet.absoluteFillObject,
+              overflow: "hidden",
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+            }}
+          />
+          <View style={styles.loadingCard}>
+            <ActivityIndicator size="large" color="#30b8b2" />
+            <Text style={styles.loadingTitle}>Loading Statistics</Text>
+            <Text style={styles.loadingSubtitle}>
+              Fetching water quality data...
+            </Text>
           </View>
         </View>
-      </ScrollView>
+      )}
     </SafeAreaView>
   );
 };
@@ -600,10 +771,7 @@ const styles = StyleSheet.create({
     width: 34,
   },
   daysContainer: {
-    // backgroundColor: "#fff",
     paddingVertical: 15,
-    // borderBottomWidth: 1,
-    // borderBottomColor: "#e0e0e0",
   },
   daysList: {
     paddingHorizontal: 15,
@@ -744,6 +912,73 @@ const styles = StyleSheet.create({
   },
   activeMonthNameText: {
     color: "#fff",
+    fontWeight: "600",
+  },
+  // Loading overlay styles
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(30, 42, 71, 0.8)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  loadingCard: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 30,
+    width: "80%",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  loadingTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#1e2a47",
+    marginTop: 20,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  loadingSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
+    lineHeight: 20,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  errorTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  errorSubtitle: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  retryButton: {
+    backgroundColor: "#30b8b2",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: "#fff",
+    fontSize: 16,
     fontWeight: "600",
   },
 });

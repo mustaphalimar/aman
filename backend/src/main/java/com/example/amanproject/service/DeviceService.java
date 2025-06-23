@@ -1,6 +1,7 @@
 package com.example.amanproject.service;
 
-import com.example.amanproject.dto.DeviceDTO;
+import com.example.amanproject.dto.device.DeviceDTO;
+import com.example.amanproject.enums.DeviceStatus;
 import com.example.amanproject.model.Device;
 import com.example.amanproject.model.User;
 import com.example.amanproject.repository.DeviceRepository;
@@ -19,6 +20,15 @@ public class DeviceService {
 
     @Autowired
     private UserRepository userRepository;
+
+
+    public Device updateDeviceStatus(Long deviceId, DeviceStatus status) {
+        Device device = deviceRepository.findById(deviceId)
+                .orElseThrow(() -> new RuntimeException("Device not found"));
+
+        device.setStatus(status);
+        return deviceRepository.save(device);
+    }
 
     public DeviceDTO createDevice(DeviceDTO dto) {
         User user = userRepository.findById(dto.getUserId())
