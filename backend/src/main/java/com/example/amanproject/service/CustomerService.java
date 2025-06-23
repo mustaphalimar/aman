@@ -1,9 +1,10 @@
 package com.example.amanproject.service;
 
 
-import com.example.amanproject.dto.*;
-import com.example.amanproject.dto.requests.UpdateCustomerDTO;
-import com.example.amanproject.enums.PaymentStatus;
+import com.example.amanproject.dto.customer.CustomerDetailDTO;
+import com.example.amanproject.dto.customer.CustomerListDto;
+import com.example.amanproject.dto.device.DeviceWithSensorsAndQualityDto;
+import com.example.amanproject.dto.whaterquality.WaterQualityStatusDto;
 import com.example.amanproject.model.*;
 import com.example.amanproject.repository.PaymentRepository;
 import com.example.amanproject.repository.RoleRepository;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class CustomerService {
@@ -85,6 +85,19 @@ public class CustomerService {
         return new CustomerDetailDTO(user, deviceDto, payments);
     }
 
+
+
+    public User updateCustomer(Long userId, User updatedUser) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setFirst_name(updatedUser.getFirst_name());
+        user.setLast_name(updatedUser.getLast_name());
+        user.setEmail(updatedUser.getEmail());
+        user.setPhone(updatedUser.getPhone());
+
+        return userRepository.save(user);
+    }
 
 
     private String evaluateWaterQuality(WaterQualityData data) {

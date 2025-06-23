@@ -1,9 +1,5 @@
 package com.example.amanproject.repository;
 
-import com.example.amanproject.dto.CustomerOverviewDTO;
-import com.example.amanproject.enums.PaymentStatus;
-import com.example.amanproject.enums.Role;
-
 import com.example.amanproject.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

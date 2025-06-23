@@ -1,7 +1,7 @@
 package com.example.amanproject.service.mobileSevices;
 
 
-import com.example.amanproject.dto.WaterQualityStatusDto;
+import com.example.amanproject.dto.whaterquality.WaterQualityStatusDto;
 import com.example.amanproject.model.WaterQualityData;
 import com.example.amanproject.repository.DeviceRepository;
 import com.example.amanproject.repository.WaterQualityDataRepository;

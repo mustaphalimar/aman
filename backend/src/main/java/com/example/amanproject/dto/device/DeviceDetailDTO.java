@@ -1,4 +1,6 @@
-package com.example.amanproject.dto;
+package com.example.amanproject.dto.device;
+
+import com.example.amanproject.dto.SensorDTO;
 
 import java.sql.Timestamp;
 import java.util.List;

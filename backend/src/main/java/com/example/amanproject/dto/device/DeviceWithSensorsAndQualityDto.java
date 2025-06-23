@@ -1,5 +1,6 @@
-package com.example.amanproject.dto;
+package com.example.amanproject.dto.device;
 
+import com.example.amanproject.dto.whaterquality.WaterQualityStatusDto;
 import com.example.amanproject.model.Sensor;
 
 import java.util.List;

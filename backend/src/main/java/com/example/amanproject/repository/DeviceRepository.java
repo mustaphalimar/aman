@@ -30,5 +30,7 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
     long customCountByStatus(@Param("status") DeviceStatus status);
 
     List<Device> findByUserId(Long userId);
+    Optional<Device> findById(Long id);
+
 }
 

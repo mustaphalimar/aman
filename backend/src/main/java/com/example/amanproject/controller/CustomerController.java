@@ -1,14 +1,14 @@
 package com.example.amanproject.controller;
 
-import com.example.amanproject.dto.*;
-import com.example.amanproject.dto.requests.UpdateCustomerDTO;
+import com.example.amanproject.dto.customer.CustomerDetailDTO;
+import com.example.amanproject.dto.customer.CustomerListDto;
+import com.example.amanproject.model.User;
 import com.example.amanproject.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @PreAuthorize("hasRole('ADMIN')")
@@ -20,9 +20,6 @@ public class CustomerController {
     private CustomerService customerService;
 
 
-
-
-
     @GetMapping
     public ResponseEntity<List<CustomerListDto>> getAllCustomers() {
         return ResponseEntity.ok(customerService.getAllCustomers());
@@ -32,6 +29,13 @@ public class CustomerController {
     public ResponseEntity<CustomerDetailDTO> getCustomerDetails(@PathVariable Long id) {
         return ResponseEntity.ok(customerService.getCustomerDetails(id));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateCustomer(@PathVariable Long id, @RequestBody User updatedUser) {
+        User user = customerService.updateCustomer(id, updatedUser);
+        return ResponseEntity.ok(user);
+    }
+
 
     /*
 

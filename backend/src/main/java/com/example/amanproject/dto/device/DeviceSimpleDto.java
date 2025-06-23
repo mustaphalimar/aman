@@ -1,4 +1,4 @@
-package com.example.amanproject.dto;
+package com.example.amanproject.dto.device;
 
 public class DeviceSimpleDto {
     private Long deviceId;

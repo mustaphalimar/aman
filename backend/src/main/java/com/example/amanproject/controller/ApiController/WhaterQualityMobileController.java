@@ -1,6 +1,6 @@
 package com.example.amanproject.controller.ApiController;
 
-import com.example.amanproject.dto.WaterQualityStatusDto;
+import com.example.amanproject.dto.whaterquality.WaterQualityStatusDto;
 
 import com.example.amanproject.service.mobileSevices.WaterQualityDataServiceMobile;
 

@@ -1,5 +1,6 @@
-package com.example.amanproject.dto;
+package com.example.amanproject.dto.customer;
 
+import com.example.amanproject.dto.device.DeviceWithSensorsAndQualityDto;
 import com.example.amanproject.model.Payment;
 import com.example.amanproject.model.User;
 
