@@ -37,8 +37,6 @@ public class CustomerController {
     }
 
 
-    /*
-
     @GetMapping("/overview")
     public ResponseEntity<List<CustomerOverviewDTO>> getCustomersOverview() {
         List<CustomerOverviewDTO> customers = customerService.getCustomerOverview();
@@ -88,4 +86,3 @@ public class CustomerController {
     */
 
 }
-

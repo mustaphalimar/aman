@@ -1,6 +1,7 @@
 package com.example.amanproject.service;
 
 
+
 import com.example.amanproject.dto.customer.CustomerDetailDTO;
 import com.example.amanproject.dto.customer.CustomerListDto;
 import com.example.amanproject.dto.device.DeviceWithSensorsAndQualityDto;
@@ -8,6 +9,11 @@ import com.example.amanproject.dto.whaterquality.WaterQualityStatusDto;
 import com.example.amanproject.model.*;
 import com.example.amanproject.repository.PaymentRepository;
 import com.example.amanproject.repository.RoleRepository;
+
+import com.example.amanproject.dto.CustomerOverviewDTO;
+import com.example.amanproject.enums.PaymentStatus;
+import com.example.amanproject.enums.Role;
+
 import com.example.amanproject.repository.UserRepository;
 import com.example.amanproject.repository.WaterQualityDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,6 +119,7 @@ public class CustomerService {
 
     /*
     public List<CustomerOverviewDTO> getCustomerOverview() {
+
         List<User> customers = userRepository.findAllCustomersWithDeviceAndSensors();
         return customers.stream()
                 .map(this::convertToOverviewDTO)
@@ -223,6 +230,11 @@ public class CustomerService {
                 user.getCreatedAt(),
                 deviceDTO
         );
+
+        return userRepository.fetchCustomerOverview(
+                PaymentStatus.COMPLETED,
+                Role.CUSTOMER);
+
     }
 
     private DeviceDetailDTO convertToDeviceDetailDTO(Device device) {
@@ -252,5 +264,3 @@ public class CustomerService {
     }*/
 
 }
-
-

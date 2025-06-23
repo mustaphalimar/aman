@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+
     Optional<User> findByEmail(String email);
 
     @Query("SELECT DISTINCT u FROM User u " +
@@ -73,6 +74,41 @@ public interface UserRepository extends JpaRepository<User, Long> {
     ); */
 
 
+
+
+        Optional<User> findByEmail(String email);
+
+        /*
+         * @Query("SELECT new com.example.amanproject.dto.CustomerOverviewDTO(" +
+         * "u.name, u.email, COALESCE(d.deviceType, 'Unknown'), " +
+         * "SUM(p.amount), " +
+         * "COUNT(d)) " +
+         * "FROM User u " +
+         * "LEFT JOIN u.devices d " +
+         * "LEFT JOIN Payment p ON p.user.id = u.id " +
+         * "WHERE u.role = :clientRole AND p.status = :completedStatus " +
+         * "GROUP BY u.id, d.deviceType")
+         * List<CustomerOverviewDTO> fetchCustomerOverview(
+         * 
+         * @Param("completedStatus") PaymentStatus completedStatus,
+         * 
+         * @Param("clientRole") Role clientRole
+         * );
+         */
+
+        @Query("SELECT new com.example.amanproject.dto.CustomerOverviewDTO(" +
+                        " CONCAT(u.first_name, ' ', u.last_name), u.email, " +
+                        "'ALL', " +
+                        "SUM(p.amount), " +
+                        "COUNT(DISTINCT d.id)) " +
+                        "FROM User u " +
+                        "LEFT JOIN u.devices d " +
+                        "LEFT JOIN Payment p ON p.user.id = u.id " +
+                        "WHERE u.role = :clientRole AND p.status = :completedStatus " +
+                        "GROUP BY u.id")
+        List<CustomerOverviewDTO> fetchCustomerOverview(
+                        @Param("completedStatus") PaymentStatus completedStatus,
+                        @Param("clientRole") Role clientRole);
 
 
 }
