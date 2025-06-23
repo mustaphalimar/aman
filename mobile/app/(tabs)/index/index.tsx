@@ -1,3 +1,4 @@
+import { useDeviceId } from "@/hooks/use-device-id";
 import { WaterQualityStatus } from "@/intarfaces";
 import { getLatestWaterStatus } from "@/Services/WaterQualityService";
 import { Feather } from "@expo/vector-icons";
@@ -50,8 +51,8 @@ const HomeScreen: React.FC = () => {
   const [statusData, setStatusData] = useState<WaterQualityStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [colorStatus, setColorStatus] = useState("");
-
-  const deviceId = 1; // change as needed
+  const useDeviceIdHook = useDeviceId();
+  const deviceId = useDeviceIdHook.deviceId;
 
   const data: ChartData = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
@@ -88,12 +89,14 @@ const HomeScreen: React.FC = () => {
     data: db,
     isLoading: isl,
     error,
+    isRefetching,
+    dataUpdatedAt,
   } = useQuery({
     queryKey: ["dashboard_data", deviceId],
     queryFn: async () => {
       try {
         const result = await getLatestWaterStatus(deviceId);
-        console.log("Fetched data:", result);
+        console.log("Fetched data at:", new Date().toISOString(), result);
         return result;
       } catch (error) {
         console.error("Error in queryFn:", error);
@@ -101,19 +104,14 @@ const HomeScreen: React.FC = () => {
       }
     },
     refetchInterval: 5000,
+    refetchIntervalInBackground: true,
     staleTime: 0, // Always consider data stale
-    cacheTime: 0, // Don't cache data
+    gcTime: 0, // Don't cache data (updated from cacheTime)
     retry: 3,
     retryDelay: 1000,
-    onSuccess: (data) => {
-      console.log("Query successful, data:", data);
-      if (data?.status) {
-        setColorStatus(getStatusColor(data.status));
-      }
-    },
-    onError: (error) => {
-      console.error("Query error:", error);
-    },
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    enabled: true,
   });
 
   // Alternative approach - using useEffect with React Query data
@@ -121,9 +119,28 @@ const HomeScreen: React.FC = () => {
     if (db?.status) {
       const newColorStatus = getStatusColor(db.status);
       setColorStatus(newColorStatus);
-      console.log("Updated color status:", newColorStatus);
+      console.log(
+        "Updated color status:",
+        newColorStatus,
+        "at:",
+        new Date().toISOString(),
+      );
     }
-  }, [db?.status]);
+  }, [db?.status, dataUpdatedAt]);
+
+  // Add debug logging for refetch behavior
+  useEffect(() => {
+    console.log(
+      "Query state - isLoading:",
+      isl,
+      "isRefetching:",
+      isRefetching,
+      "error:",
+      error,
+      "dataUpdatedAt:",
+      new Date(dataUpdatedAt || 0).toISOString(),
+    );
+  }, [isl, isRefetching, error, dataUpdatedAt]);
 
   // Handle error state
   if (error) {
