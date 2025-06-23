@@ -347,6 +347,7 @@ const styles = StyleSheet.create({
   },
   welcomeCard: {
     borderRadius: 20,
+
     margin: 20,
     padding: 20,
     paddingBottom: 0,

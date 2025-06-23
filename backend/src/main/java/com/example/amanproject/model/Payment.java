@@ -24,6 +24,7 @@ public class Payment {
     private User user;
 
     @ManyToOne
+    @JsonIgnore
     private Device device;
 
     private BigDecimal amount;

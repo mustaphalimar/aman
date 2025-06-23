@@ -65,7 +65,7 @@ public class WaterQualityDataServiceMobile {
         else if (tds > 500 && tds <= 1000) warningCount++;
 
         // Chlorine
-        if (chlorine < 0.1 || chlorine > 1.5) dangerCount++;
+        if (chlorine < 0.1  || chlorine > 1.5) dangerCount++;
         else if ((chlorine >= 0.1 && chlorine < 0.2) || (chlorine > 1 && chlorine <= 1.5)) warningCount++;
 
         if (dangerCount > 0) return "danger";

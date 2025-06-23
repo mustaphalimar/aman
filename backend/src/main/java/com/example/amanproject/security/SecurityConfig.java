@@ -47,29 +47,18 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/register").permitAll()
                         .requestMatchers("/api/waterquality/send/{deviceId}").permitAll()
-
-
-
                         .requestMatchers(HttpMethod.GET, "/api/sensors/getall").permitAll()
-
-                        //mobile/whaterquality/daily/raw
-                        //whaterquality/daily/curve
-
                         .requestMatchers("/api/mobile/whaterquality/**").hasRole("CUSTOMER")
-
                                 // Restrict POST, PUT, DELETE to ADMIN role
                         .requestMatchers(HttpMethod.POST, "/api/sensors").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/sensors/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/sensors/**").hasRole("ADMIN")
-
-                        //.requestMatchers("/api/sensors/getall").permitAll()
-
                         .requestMatchers("api/dashboard/revenue").hasRole(Role.ADMIN.toString())
                         .requestMatchers("api/dashboard/devices/active").hasRole(Role.ADMIN.toString())
                         .requestMatchers("api/dashboard/sales").hasRole(Role.ADMIN.toString())
                         .requestMatchers("api/dashboard/subscriptions").hasRole(Role.ADMIN.toString())
                         .requestMatchers("/api/dashboard/recent-sales").hasRole(Role.ADMIN.toString())
-                        .requestMatchers("api/customers/overview").hasRole(Role.CUSTOMER.toString())
+                        .requestMatchers("api/customers/**").hasRole(Role.ADMIN.toString())
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
