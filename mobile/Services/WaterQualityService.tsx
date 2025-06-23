@@ -5,7 +5,7 @@ export const getLatestWaterStatus = async (deviceId: number) => {
   const response = await apiClient.get(
     `/mobile/whaterquality/status/${deviceId}`
   );
-  //console.log("data recived from server of whatter quality : " + response.data);
+  console.log("data recived from server of whatter quality : " + response.data);
   return response.data;
 };
 

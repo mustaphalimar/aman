@@ -1,10 +1,11 @@
+import { useDeviceId } from "@/hooks/use-device-id";
 import { WaterQualityStatus } from "@/intarfaces";
 import { getLatestWaterStatus } from "@/Services/WaterQualityService";
 import { Feather } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -50,8 +51,8 @@ const HomeScreen: React.FC = () => {
   const [statusData, setStatusData] = useState<WaterQualityStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [colorStatus, setColorStatus] = useState("");
-
-  const deviceId = 1; // change as needed
+  const useDeviceIdHook = useDeviceId();
+  const deviceId = useDeviceIdHook.deviceId;
 
   const data: ChartData = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
@@ -84,15 +85,67 @@ const HomeScreen: React.FC = () => {
 
   const [isMounted, setIsMounted] = useState(false);
 
-  const { data: db, isLoading: isl } = useQuery({
-    queryKey: ["dashboard_data"],
+  const {
+    data: db,
+    isLoading: isl,
+    error,
+    isRefetching,
+    dataUpdatedAt,
+  } = useQuery({
+    queryKey: ["dashboard_data", deviceId],
     queryFn: async () => {
-      const db = await getLatestWaterStatus(deviceId);
-      setColorStatus(getStatusColor(db?.status));
-      return db;
+      try {
+        const result = await getLatestWaterStatus(deviceId);
+        console.log("Fetched data at:", new Date().toISOString(), result);
+        return result;
+      } catch (error) {
+        console.error("Error in queryFn:", error);
+        throw error;
+      }
     },
     refetchInterval: 5000,
+    refetchIntervalInBackground: true,
+    staleTime: 0, // Always consider data stale
+    gcTime: 0, // Don't cache data (updated from cacheTime)
+    retry: 3,
+    retryDelay: 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    enabled: true,
   });
+
+  // Alternative approach - using useEffect with React Query data
+  useEffect(() => {
+    if (db?.status) {
+      const newColorStatus = getStatusColor(db.status);
+      setColorStatus(newColorStatus);
+      console.log(
+        "Updated color status:",
+        newColorStatus,
+        "at:",
+        new Date().toISOString(),
+      );
+    }
+  }, [db?.status, dataUpdatedAt]);
+
+  // Add debug logging for refetch behavior
+  useEffect(() => {
+    console.log(
+      "Query state - isLoading:",
+      isl,
+      "isRefetching:",
+      isRefetching,
+      "error:",
+      error,
+      "dataUpdatedAt:",
+      new Date(dataUpdatedAt || 0).toISOString(),
+    );
+  }, [isl, isRefetching, error, dataUpdatedAt]);
+
+  // Handle error state
+  if (error) {
+    console.error("Data fetching error:", error);
+  }
 
   // useEffect(() => {
   //   setIsMounted(true);
@@ -311,6 +364,7 @@ const styles = StyleSheet.create({
   },
   welcomeCard: {
     borderRadius: 20,
+
     margin: 20,
     padding: 20,
     paddingBottom: 0,

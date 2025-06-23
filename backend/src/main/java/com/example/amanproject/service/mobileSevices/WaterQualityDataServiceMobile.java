@@ -1,12 +1,16 @@
 package com.example.amanproject.service.mobileSevices;
 
 
-import com.example.amanproject.dto.WaterQualityStatusDto;
+import com.example.amanproject.dto.whaterquality.WaterQualityStatusDto;
 import com.example.amanproject.model.WaterQualityData;
 import com.example.amanproject.repository.DeviceRepository;
 import com.example.amanproject.repository.WaterQualityDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class WaterQualityDataServiceMobile {
@@ -35,6 +39,16 @@ public class WaterQualityDataServiceMobile {
 
 
     public String evaluateWaterQuality(WaterQualityData data) {
+        double tds = data.getTds();
+
+        if (tds > 500) {
+            return "danger";
+        } else if (tds > 300) {
+            return "warning";
+        } else {
+            return "normal";
+        }
+        /*
         int dangerCount = 0;
         int warningCount = 0;
 
@@ -61,12 +75,14 @@ public class WaterQualityDataServiceMobile {
         else if (tds > 500 && tds <= 1000) warningCount++;
 
         // Chlorine
-        if (chlorine < 0.1 || chlorine > 1.5) dangerCount++;
+        if (chlorine < 0.1  || chlorine > 1.5) dangerCount++;
         else if ((chlorine >= 0.1 && chlorine < 0.2) || (chlorine > 1 && chlorine <= 1.5)) warningCount++;
 
         if (dangerCount > 0) return "danger";
         else if (warningCount > 0) return "warning";
         else return "normal";
+        */
+
     }
 
 /*
@@ -111,7 +127,7 @@ public class WaterQualityDataServiceMobile {
         );
     }
 
-
+*/
 
 
     public List<Map<String, Object>> getSensorCurves(Long deviceId, LocalDate date) {
@@ -171,7 +187,7 @@ public class WaterQualityDataServiceMobile {
     }
 
 
-
+/*
     public String evaluateWaterQuality(WaterQualityData entity) {
         return evaluateWaterQuality(
                 entity.getpH(),

@@ -1,7 +1,7 @@
 package com.example.amanproject.controller;
 
 
-import com.example.amanproject.dto.WaterQualityDataDto;
+import com.example.amanproject.dto.whaterquality.WaterQualityDataDto;
 import com.example.amanproject.service.WaterQualityDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
