@@ -28,7 +28,18 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: true,
+        staleTime: 0,
+        gcTime: 0,
+        retry: 3,
+        retryDelay: 1000,
+      },
+    },
+  });
 
   useEffect(() => {
     async function prepare() {
