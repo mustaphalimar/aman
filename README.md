@@ -14,7 +14,7 @@ readings come in live.
      it to a release), then replace the link below with the resulting
      https://github.com/user-attachments/assets/... URL on a line of its own. -->
 
-▶ [Watch the demo](demo.mp4) (8.5 MB, 720p, no audio)
+▶ [Watch the demo](IMG_1108_demo.mp4) (8.5 MB, 720p, no audio)
 
 ```
 aman/
