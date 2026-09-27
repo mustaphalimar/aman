@@ -10,11 +10,11 @@ payments and subscriptions through the same API.
 A walkthrough of the app: pairing a device by QR code and watching the water-quality
 readings come in live.
 
-<!-- For an inline player on GitHub, drag IMG_1108_demo.mp4 into any issue or PR comment
-     (or attach it to a release), then replace the link below with the resulting
+<!-- For an inline player on GitHub, drag demo.mp4 into any issue or PR comment (or attach
+     it to a release), then replace the link below with the resulting
      https://github.com/user-attachments/assets/... URL on a line of its own. -->
 
-▶ [Watch the demo](IMG_1108_demo.mp4) (41 MB, MP4)
+▶ [Watch the demo](demo.mp4) (8.5 MB, 720p, no audio)
 
 ```
 aman/
